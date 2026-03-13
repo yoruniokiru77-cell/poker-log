@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -16,7 +17,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .ph{padding:calc(var(--sat) + 14px) 16px 12px;border-bottom:1px solid var(--pk-border);display:flex;align-items:center;gap:10px;background:var(--pk-surface);position:sticky;top:0;z-index:5}
 .ph h1{font-size:17px;font-weight:600;color:var(--pk-text)}.ph-sub{font-size:11px;color:var(--pk-muted);margin-top:1px}
 .back-btn{width:44px;height:44px;border:none;background:none;cursor:pointer;color:var(--pk-gold);display:flex;align-items:center;justify-content:center;border-radius:10px;flex-shrink:0}
-.back-btn:active{background:var(--pk-surface2)}
 .sync-bar{display:flex;align-items:center;gap:7px;padding:8px 14px;font-size:11px;color:var(--pk-muted);background:var(--pk-surface);border-bottom:1px solid var(--pk-border)}
 .sdot{width:7px;height:7px;border-radius:50%;background:var(--pk-hint);flex-shrink:0;transition:background 0.3s}
 .sdot.ok{background:#4ecf8a}.sdot.busy{background:var(--pk-gold)}.sdot.err{background:var(--pk-red)}
@@ -32,13 +32,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .ts:focus{border-color:var(--pk-gold)}
 .btn{display:flex;align-items:center;justify-content:center;padding:15px;border:1px solid var(--pk-border2);border-radius:12px;background:transparent;cursor:pointer;font-size:15px;font-weight:500;color:var(--pk-text);font-family:inherit;width:100%;-webkit-appearance:none;appearance:none;min-height:50px}
 .btn:active{background:var(--pk-surface3)}
-.btn-gold{background:var(--pk-gold);color:#0a0a0a;border-color:var(--pk-gold)}
-.btn-gold:active{opacity:0.85}
+.btn-gold{background:var(--pk-gold);color:#0a0a0a;border-color:var(--pk-gold)}.btn-gold:active{opacity:0.85}
 .btn-gold:disabled{background:var(--pk-gold-dim);color:#555;border-color:var(--pk-gold-dim);cursor:not-allowed}
 .btn-red{color:var(--pk-red);border-color:var(--pk-red-dim)}.btn-red:active{background:rgba(201,64,64,0.12)}
 .chip-sel{display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border:1px solid var(--pk-border2);border-radius:50px;cursor:pointer;font-size:14px;background:var(--pk-surface2);color:var(--pk-muted);font-family:inherit;-webkit-appearance:none;min-height:44px}
 .chip-sel.on{background:var(--pk-gold);color:#0a0a0a;border-color:var(--pk-gold);font-weight:600}
-.chip-sel:active{opacity:0.8}
 .av-lg{width:44px;height:44px;font-size:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0;border:1px solid var(--pk-border2)}
 .pcard{background:var(--pk-surface);border:1px solid var(--pk-border);border-radius:14px;margin:0 12px 10px;padding:14px}
 .snum{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-0.5px}
@@ -46,7 +44,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .sok{background:rgba(26,158,94,0.15);color:#4ecf8a;border:1px solid rgba(26,158,94,0.3);padding:12px 14px;margin:0 12px 10px;border-radius:10px;font-size:13px;font-weight:500}
 .sng{background:rgba(201,64,64,0.12);color:#e06060;border:1px solid rgba(201,64,64,0.25);padding:12px 14px;margin:0 12px 10px;border-radius:10px;font-size:13px;font-weight:500}
 .calc-btn{min-width:44px;height:44px;border:1px solid var(--pk-border2);border-radius:10px;background:var(--pk-surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--pk-gold);flex-shrink:0}
-.calc-btn:active{background:var(--pk-surface3)}.calc-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.calc-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .lbl{font-size:11px;color:var(--pk-muted);margin-bottom:5px;letter-spacing:0.04em}
 .row{display:flex;gap:10px;align-items:center}.rowb{display:flex;justify-content:space-between;align-items:center}
 .loan-item{background:var(--pk-surface2);border:1px solid var(--pk-border);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -54,7 +52,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .loan-pending{background:rgba(201,168,76,0.15);color:var(--pk-gold);border:1px solid var(--pk-gold-dim)}
 .loan-applied{background:rgba(26,158,94,0.15);color:#4ecf8a;border:1px solid rgba(26,158,94,0.3)}
 .rm-btn{width:44px;height:44px;border:none;background:none;cursor:pointer;color:var(--pk-red);font-size:20px;display:flex;align-items:center;justify-content:center;border-radius:6px;flex-shrink:0}
-.rm-btn:active{background:rgba(201,64,64,0.15)}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:50;align-items:flex-end;justify-content:center}
 .overlay.open{display:flex}
 .sheet{background:var(--pk-surface);border-radius:20px 20px 0 0;border-top:1px solid var(--pk-border2);padding:18px 14px;padding-bottom:calc(24px + var(--sab));width:100%;max-width:430px;max-height:90vh;overflow-y:auto}
@@ -62,18 +59,68 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .cr{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--pk-border)}.cr:last-of-type{border-bottom:none}
 .cdot{width:14px;height:14px;border-radius:50%;flex-shrink:0}.cname{font-size:13px;font-weight:600;width:48px}
 .cminus,.cplus{width:44px;height:44px;border:1px solid var(--pk-border2);background:var(--pk-surface2);cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;color:var(--pk-text);font-family:inherit}
-.cminus{border-radius:10px 0 0 10px}.cplus{border-radius:0 10px 10px 0}.cminus:active,.cplus:active{background:var(--pk-surface3)}
+.cminus{border-radius:10px 0 0 10px}.cplus{border-radius:0 10px 10px 0}
 .cnum{width:50px;height:44px;border-top:1px solid var(--pk-border2);border-bottom:1px solid var(--pk-border2);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;background:var(--pk-surface2);color:var(--pk-text)}
 .csub{font-size:12px;color:var(--pk-muted);margin-left:auto;min-width:72px;text-align:right}
 .gtotal{font-size:26px;font-weight:600;color:var(--pk-gold)}
 .li{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--pk-border)}.li:last-child{border-bottom:none}
 .empty{text-align:center;padding:40px 16px;color:var(--pk-hint);font-size:14px}
-.ssumm{background:var(--pk-surface);border:1px solid var(--pk-border);border-radius:14px;margin:0 12px 10px;overflow:hidden}
-.rule-box{background:var(--pk-surface2);border:1px solid var(--pk-border);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--pk-muted);line-height:1.6}
 .loading{text-align:center;padding:40px 16px;color:var(--pk-hint);font-size:14px}
+.rule-box{background:var(--pk-surface2);border:1px solid var(--pk-border);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--pk-muted);line-height:1.6}
+/* 合計ブロック */
+.summ-block{background:var(--pk-surface);border:2px solid var(--pk-gold-dim);border-radius:16px;margin:0 12px 14px;overflow:hidden;box-shadow:0 2px 16px rgba(201,168,76,0.1)}
+.summ-hd{padding:11px 16px;background:rgba(201,168,76,0.07);border-bottom:1px solid var(--pk-gold-dim);display:flex;align-items:center;gap:8px}
+.summ-hd-title{font-size:12px;font-weight:700;color:var(--pk-gold);letter-spacing:0.1em}
+.summ-hd-sub{font-size:11px;color:var(--pk-muted);margin-left:auto}
+.rank-row{display:flex;align-items:center;padding:11px 16px;border-bottom:1px solid var(--pk-border)}
+.rank-row:last-child{border-bottom:none}
+.rank-badge{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-right:10px}
+.rank-1{background:rgba(201,168,76,0.2);color:var(--pk-gold);border:1.5px solid var(--pk-gold)}
+.rank-2{background:rgba(180,180,180,0.15);color:#bbb;border:1.5px solid #666}
+.rank-3{background:rgba(180,110,50,0.18);color:#c88040;border:1.5px solid #7a4a20}
+.rank-n{background:var(--pk-surface2);color:var(--pk-hint);border:1px solid var(--pk-border2)}
+/* セッションカード */
+.sess-card{background:var(--pk-surface);border:1px solid var(--pk-border);border-radius:14px;margin:0 12px 10px;overflow:hidden}
+.sess-card.chk-on{border-color:var(--pk-gold);box-shadow:0 0 0 1px var(--pk-gold-dim)}
+.sess-chk{width:22px;height:22px;border:2px solid var(--pk-border2);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--pk-surface2);transition:all 0.15s}
+.sess-chk.on{background:var(--pk-gold);border-color:var(--pk-gold)}
+.sess-chk svg{opacity:0;width:13px;height:13px;stroke:#0a0a0a;fill:none;stroke-width:3}
+.sess-chk.on svg{opacity:1}
+.sess-hd{padding:10px 14px;border-bottom:1px solid var(--pk-border);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.sess-date{font-size:12px;font-weight:600;color:var(--pk-muted)}
+.badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;white-space:nowrap}
+.badge-settled{background:rgba(26,158,94,0.15);color:#4ecf8a;border:1px solid rgba(26,158,94,0.3)}
+.badge-pending{background:rgba(201,168,76,0.12);color:var(--pk-gold);border:1px solid var(--pk-gold-dim)}
+.edit-actions{display:flex;gap:5px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end}
+.eab{padding:4px 9px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid;white-space:nowrap;min-height:28px}
+/* 編集モードバー */
+.edit-mode-bar{background:rgba(201,168,76,0.08);border-bottom:1px solid var(--pk-gold-dim);padding:8px 14px;display:none;align-items:center;gap:8px}
+.edit-mode-bar.show{display:flex}
+.edit-mode-label{font-size:12px;font-weight:600;color:var(--pk-gold);flex:1}
+.etbtn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;border:1px solid;white-space:nowrap}
+.etbtn-off{color:var(--pk-gold);border-color:var(--pk-gold-dim);background:transparent}
+.etbtn-on{color:#0a0a0a;border-color:var(--pk-gold);background:var(--pk-gold)}
+.etbtn-done{color:var(--pk-red);border-color:var(--pk-red-dim);background:transparent}
+/* 選択フローティングバー */
+.sel-bar{position:fixed;bottom:calc(70px + var(--sab));left:50%;transform:translateX(-50%) translateY(16px);width:calc(100% - 32px);max-width:398px;z-index:8;opacity:0;pointer-events:none;transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1)}
+.sel-bar.show{opacity:1;pointer-events:all;transform:translateX(-50%) translateY(0)}
+.sel-bar-inner{background:var(--pk-gold);color:#0a0a0a;border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 24px rgba(0,0,0,0.5)}
+.sel-bar-txt{font-size:13px;font-weight:700}
+.sel-bar-btn{background:#0a0a0a;color:var(--pk-gold);border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+/* モーダル */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:60;align-items:center;justify-content:center;padding:20px}
+.modal-ov.open{display:flex}
+.modal{background:var(--pk-surface);border-radius:18px;border:1px solid var(--pk-border2);padding:20px;width:100%;max-width:390px;max-height:82vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:700;color:var(--pk-gold);margin-bottom:12px;text-align:center}
+/* 抽出 */
+.ext-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--pk-border)}
+.ext-row:last-child{border-bottom:none}
+.ext-input{width:96px;padding:9px 10px;border:1px solid var(--pk-border2);border-radius:9px;background:var(--pk-surface2);color:var(--pk-text);font-family:inherit;font-size:15px;text-align:right;-webkit-appearance:none;-webkit-text-fill-color:var(--pk-text);outline:none}
+.ext-input:focus{border-color:var(--pk-gold)}
 </style>
 </head>
 <body>
+
 <div id="s-home" class="screen active">
   <div class="ph"><div><h1>♠ Poker Log</h1><div class="ph-sub">共有収支管理</div></div></div>
   <div class="sync-bar"><div class="sdot" id="sdot"></div><span id="sstat">接続中...</span></div>
@@ -104,7 +151,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
     </div>
   </div>
   <div style="padding:0 12px;margin-bottom:10px">
-    <div class="rule-box"><span style="color:var(--pk-gold);font-weight:600">反映ルール：</span>貸した人 <span style="color:#4ecf8a">+増加</span>（返してもらえる）　借りた人 <span style="color:#e06060">−減少</span>（最後に返す）</div>
+    <div class="rule-box"><span style="color:var(--pk-gold);font-weight:600">反映ルール：</span>貸した人 <span style="color:#4ecf8a">+増加</span>　借りた人 <span style="color:#e06060">−減少</span></div>
     <button class="btn" style="border-color:var(--pk-green-dim);color:#4ecf8a" onclick="applyLoans()">貸し借りをスタックに反映</button>
   </div>
   <div style="padding:0 12px;display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-bottom:4px">
@@ -114,8 +161,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 </div>
 
 <div id="s-search" class="screen">
-  <div class="ph"><h1>検索</h1></div>
+  <div class="ph" style="justify-content:space-between">
+    <h1>検索</h1>
+    <button id="etbtn" class="etbtn etbtn-off" onclick="toggleEditMode()">✏️ 編集</button>
+  </div>
   <div class="sync-bar"><div class="sdot" id="sdot2"></div><span id="sstat2">-</span></div>
+  <div class="edit-mode-bar" id="edit-mode-bar">
+    <span class="edit-mode-label">✏️ 編集モード中</span>
+    <button class="etbtn etbtn-done" onclick="toggleEditMode()">完了</button>
+  </div>
   <div style="height:12px"></div>
   <div class="card"><div class="ch">期間</div><div class="cb" style="display:grid;gap:10px">
     <div><div class="lbl">From</div><input type="date" id="search-from" class="ti"></div>
@@ -136,6 +190,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
   <div class="card" style="padding:0"><div id="master-list"><div class="loading">読み込み中...</div></div></div>
 </div>
 
+<!-- チップ電卓 -->
 <div id="chip-overlay" class="overlay" onclick="if(event.target===this)closeChip()">
   <div class="sheet">
     <div class="mhandle"></div>
@@ -153,6 +208,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
   </div>
 </div>
 
+<!-- 名前編集 -->
 <div id="edit-overlay" class="overlay" onclick="if(event.target===this)closeEdit()">
   <div class="sheet">
     <div class="mhandle"></div>
@@ -162,6 +218,51 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
       <button class="btn" onclick="closeEdit()">キャンセル</button>
       <button class="btn btn-gold" onclick="saveEdit()">保存</button>
     </div>
+  </div>
+</div>
+
+<!-- 選択合計モーダル -->
+<div id="summ-modal" class="modal-ov" onclick="if(event.target===this)closeSummModal()">
+  <div class="modal">
+    <div class="modal-title">📊 選択セッションの合計</div>
+    <div style="font-size:11px;color:var(--pk-muted);text-align:center;margin-bottom:14px" id="summ-sub"></div>
+    <div id="summ-body"></div>
+    <div style="height:14px"></div>
+    <button class="btn btn-gold" onclick="closeSummModal()">閉じる</button>
+  </div>
+</div>
+
+<!-- 抽出モーダル -->
+<div id="ext-modal" class="modal-ov" onclick="if(event.target===this)closeExtModal()">
+  <div class="modal">
+    <div class="modal-title">💸 未精算額を抽出</div>
+    <div style="font-size:11px;color:var(--pk-muted);text-align:center;margin-bottom:14px" id="ext-sub"></div>
+    <div id="ext-body"></div>
+    <div style="font-size:10px;color:var(--pk-hint);padding:8px 0;border-top:1px solid var(--pk-border);margin-top:6px">プラス → stack減少（取り出し）　マイナス → stack増加（追加）</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+      <button class="btn" onclick="closeExtModal()">キャンセル</button>
+      <button class="btn btn-gold" onclick="applyExtract()">適用する</button>
+    </div>
+  </div>
+</div>
+
+<!-- セッション編集モーダル -->
+<div id="sedit-modal" class="modal-ov" onclick="if(event.target===this)closeSEditModal()">
+  <div class="modal">
+    <div class="modal-title" id="sedit-title">セッション編集</div>
+    <div id="sedit-body"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+      <button class="btn" onclick="closeSEditModal()">キャンセル</button>
+      <button class="btn btn-gold" onclick="saveSessEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 選択フローティングバー -->
+<div class="sel-bar" id="sel-bar">
+  <div class="sel-bar-inner">
+    <div class="sel-bar-txt" id="sel-bar-txt">0件選択</div>
+    <button class="sel-bar-btn" onclick="showSummModal()">合計を見る</button>
   </div>
 </div>
 
@@ -185,7 +286,10 @@ const CHIPS=[{v:5000,c:'#e06060'},{v:1000,c:'#5b9bd5'},{v:500,c:'#4ecf8a'},{v:10
 const AVC=[['#2a1f0a','#c9a84c'],['#0a1f14','#4ecf8a'],['#1a0a0a','#e06060'],['#0a0f1f','#5b9bd5'],['#1a0a1f','#a880e0'],['#0f1a0a','#7ecf50'],['#1f0a10','#e06070'],['#0a1a1a','#50c8c0']];
 function gc(i){return AVC[i%AVC.length]}
 function ini(n){return(n||'').slice(0,2).toUpperCase()}
-let participants=[],sessions=[],cur={players:[],loans:[]},chipTarget=null,editingId=null;
+
+let participants=[],sessions=[],cur={players:[],loans:[]};
+let chipTarget=null,editingId=null;
+let editMode=false,selectedIds=new Set(),extSessId=null,seditId=null;
 
 function setSync(state,msg){['','2','3'].forEach(s=>{const dot=document.getElementById('sdot'+s);const txt=document.getElementById('sstat'+s);if(!dot||!txt)return;dot.className='sdot '+(state==='ok'?'ok':state==='busy'?'busy':'err');txt.textContent=msg})}
 
@@ -199,10 +303,7 @@ async function load(){
     participants=await sbGet('players','select=*&order=created_at.asc');
     sessions=await sbGet('sessions','select=*&order=date.desc,created_at.desc');
     setSync('ok','共有データに接続済');
-  }catch(e){
-    setSync('err','接続エラー: '+e.message);
-    alert('Supabase接続エラー:\n'+e.message);
-  }
+  }catch(e){setSync('err','接続エラー: '+e.message);alert('接続エラー:\n'+e.message)}
   renderChips();renderMaster();
 }
 
@@ -216,12 +317,22 @@ function navTo(name){
   if(name==='home')renderChips();
 }
 
+function toggleEditMode(){
+  editMode=!editMode;
+  const btn=document.getElementById('etbtn');
+  const bar=document.getElementById('edit-mode-bar');
+  btn.textContent=editMode?'✏️ 編集中':'✏️ 編集';
+  btn.className='etbtn '+(editMode?'etbtn-on':'etbtn-off');
+  bar.classList.toggle('show',editMode);
+  const el=document.getElementById('search-results');
+  if(el.children.length&&!el.querySelector('.empty'))runSearch();
+}
+
 function renderChips(){
   const el=document.getElementById('pchips');
   if(!participants.length){el.innerHTML='<span style="font-size:13px;color:var(--pk-hint)">先に「参加者」タブで登録してください</span>';return}
   el.innerHTML=participants.map((p,i)=>{const[bg,fg]=gc(i);return`<button class="chip-sel" onclick="this.classList.toggle('on')" data-id="${p.id}"><div style="width:20px;height:20px;border-radius:50%;background:${bg};color:${fg};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;border:1px solid ${fg}50">${ini(p.name)}</div>${p.name}</button>`}).join('');
 }
-
 function startSession(){
   const sel=[...document.querySelectorAll('#pchips .on')].map(b=>b.dataset.id);
   if(sel.length<2){alert('2名以上選んでください');return}
@@ -235,7 +346,6 @@ function startSession(){
   window.scrollTo(0,0);
   renderPlayerCards();renderLoanSelects();renderLoanList();checkDiff();
 }
-
 function cancelSession(){
   cur={players:[],loans:[]};
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -245,30 +355,26 @@ function cancelSession(){
   document.querySelectorAll('#pchips .on').forEach(b=>b.classList.remove('on'));
   window.scrollTo(0,0);
 }
-
 function renderPlayerCards(){
   const el=document.getElementById('player-cards');
   el.innerHTML=cur.players.map((p,i)=>{
     const pi=participants.findIndex(x=>x.id===p.id);const[bg,fg]=gc(pi<0?i:pi);
     const diff=p.stack-INIT;const dcls=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
-    return`<div class="pcard"><div class="rowb" style="margin-bottom:13px"><div class="row" style="gap:10px"><div class="av-lg" style="background:${bg};color:${fg};border-color:${fg}50">${ini(p.name)}</div><div><div style="font-size:15px;font-weight:600;color:var(--pk-text)">${p.name}</div><div style="font-size:11px;color:var(--pk-muted)">初期 ${INIT.toLocaleString()}</div></div></div><button class="calc-btn" onclick="openChip(${i})"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/></svg></button></div><div class="rowb" style="margin-bottom:11px"><div><div class="lbl">スタック</div><div class="snum" id="sn-${i}">${p.stack.toLocaleString()}</div></div><div style="text-align:right"><div class="lbl">差分</div><div class="snum ${dcls}" id="dn-${i}">${ds}</div></div></div><input type="number" id="si-${i}" class="ti" value="${p.stack}" inputmode="numeric" oninput="upStack(${i},this.value)"></div>`;
+    return`<div class="pcard"><div class="rowb" style="margin-bottom:13px"><div class="row" style="gap:10px"><div class="av-lg" style="background:${bg};color:${fg};border-color:${fg}50">${ini(p.name)}</div><div><div style="font-size:15px;font-weight:600">${p.name}</div><div style="font-size:11px;color:var(--pk-muted)">初期 ${INIT.toLocaleString()}</div></div></div><button class="calc-btn" onclick="openChip(${i})"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/></svg></button></div><div class="rowb" style="margin-bottom:11px"><div><div class="lbl">スタック</div><div class="snum" id="sn-${i}">${p.stack.toLocaleString()}</div></div><div style="text-align:right"><div class="lbl">差分</div><div class="snum ${dcls}" id="dn-${i}">${ds}</div></div></div><input type="number" id="si-${i}" class="ti" value="${p.stack}" inputmode="numeric" oninput="upStack(${i},this.value)"></div>`;
   }).join('');
 }
-
 function upStack(i,v){
   const n=parseInt(v)||0;cur.players[i].stack=n;
   const diff=n-INIT;const dcls=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
   document.getElementById('sn-'+i).textContent=n.toLocaleString();
   const dn=document.getElementById('dn-'+i);dn.textContent=ds;dn.className='snum '+dcls;checkDiff();
 }
-
 function checkDiff(){
   const tot=cur.players.reduce((s,p)=>s+p.stack,0);const exp=cur.players.length*INIT;const d=tot-exp;
   const el=document.getElementById('diff-status');const btn=document.getElementById('save-btn');
   if(d===0){el.className='sok';el.textContent='✓ 差分ゼロ — 登録できます';btn.disabled=false}
   else{el.className='sng';el.textContent='差分: '+(d>0?'+':'')+d.toLocaleString()+' (登録不可)';btn.disabled=true}
 }
-
 function renderLoanSelects(){
   const fromOpts=[{id:'__inv__',name:'在庫'},...cur.players].map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
   const toOpts=cur.players.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
@@ -288,7 +394,7 @@ function renderLoanList(){
     const fn=l.from==='__inv__'?'在庫':cur.players.find(p=>p.id===l.from)?.name||'?';
     const tn=cur.players.find(p=>p.id===l.to)?.name||'?';
     const badge=l.applied?`<span class="loan-badge loan-applied">反映済</span>`:`<span class="loan-badge loan-pending">未反映</span>`;
-    return`<div class="loan-item"><div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:600;color:var(--pk-text);margin-bottom:3px">${fn} → ${tn}</div><div style="font-size:12px;color:var(--pk-gold)">${l.amount.toLocaleString()} pt</div></div><div class="row" style="gap:6px;flex-shrink:0">${badge}<button class="rm-btn" onclick="rmLoan(${i})">×</button></div></div>`;
+    return`<div class="loan-item"><div style="min-width:0;flex:1"><div style="font-size:13px;font-weight:600;margin-bottom:3px">${fn} → ${tn}</div><div style="font-size:12px;color:var(--pk-gold)">${l.amount.toLocaleString()} pt</div></div><div class="row" style="gap:6px">${badge}<button class="rm-btn" onclick="rmLoan(${i})">×</button></div></div>`;
   }).join('');
 }
 function applyLoans(){
@@ -297,19 +403,16 @@ function applyLoans(){
   pending.forEach(l=>{if(l.from!=='__inv__'){const fp=cur.players.find(p=>p.id===l.from);if(fp)fp.stack+=l.amount}const tp=cur.players.find(p=>p.id===l.to);if(tp)tp.stack-=l.amount;l.applied=true});
   renderPlayerCards();cur.players.forEach((p,i)=>{const inp=document.getElementById('si-'+i);if(inp)inp.value=p.stack});renderLoanList();checkDiff();
 }
-
 async function saveSession(){
   const d=document.getElementById('session-date').value;if(!d){alert('日付を入力してください');return}
   const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='保存中...';
   try{
     setSync('busy','保存中...');
-    const ns={id:Date.now().toString(),date:d,players:cur.players.map(p=>({...p})),loans:cur.loans.map(l=>({...l}))};
+    const ns={id:Date.now().toString(),date:d,settled:false,players:cur.players.map(p=>({...p})),loans:cur.loans.map(l=>({...l}))};
     await sbIns('sessions',ns);sessions.unshift(ns);
-    setSync('ok','保存完了 — 共有データに接続済');
-    alert('登録しました！');cancelSession();
-  }catch(e){setSync('err','保存失敗');alert('保存に失敗しました:\n'+e.message);btn.disabled=false;btn.textContent='登録する'}
+    setSync('ok','保存完了');alert('登録しました！');cancelSession();
+  }catch(e){setSync('err','保存失敗');alert('保存失敗:\n'+e.message);btn.disabled=false;btn.textContent='登録する'}
 }
-
 function openChip(i){
   chipTarget=i;document.getElementById('chip-title').textContent=cur.players[i].name+' — チップ計算';
   document.getElementById('chip-rows').innerHTML=CHIPS.map(c=>`<div class="cr"><div class="cdot" style="background:${c.c}"></div><div class="cname" style="color:${c.c}">${c.v>=1000?(c.v/1000)+'k':c.v}</div><div class="row" style="gap:0"><button class="cminus" onclick="adjC(${c.v},-1)">−</button><div class="cnum" id="cc${c.v}">0</div><button class="cplus" onclick="adjC(${c.v},1)">+</button></div><div class="csub" id="cs${c.v}">0</div></div>`).join('');
@@ -328,29 +431,160 @@ function applyChips(){
   cur.players.forEach((p,i)=>{const inp=document.getElementById('si-'+i);if(inp)inp.value=p.stack});checkDiff();
 }
 
+// ===== 検索 =====
 function runSearch(){
-  const from=document.getElementById('search-from').value;const to=document.getElementById('search-to').value;
+  const from=document.getElementById('search-from').value;
+  const to=document.getElementById('search-to').value;
   const filtered=sessions.filter(s=>s.date>=from&&s.date<=to);
   const el=document.getElementById('search-results');
   if(!filtered.length){el.innerHTML='<div class="empty">該当セッションなし</div>';return}
-  const totals={};
-  filtered.forEach(s=>s.players.forEach(p=>{if(!totals[p.id])totals[p.id]={name:p.name,total:0,count:0};totals[p.id].total+=p.stack-INIT;totals[p.id].count++}));
-  let html=`<div class="ssumm"><div style="padding:11px 14px;font-size:11px;font-weight:600;color:var(--pk-muted);border-bottom:1px solid var(--pk-border)">${from} 〜 ${to}（${filtered.length}セッション）</div>`;
-  Object.values(totals).sort((a,b)=>b.total-a.total).forEach(t=>{const cl=t.total>0?'dpos':t.total<0?'dneg':'dzero';const s=t.total>0?'+'+t.total.toLocaleString():t.total.toLocaleString();html+=`<div class="li"><span style="font-size:14px;color:var(--pk-text)">${t.name} <span style="font-size:11px;color:var(--pk-hint)">${t.count}回</span></span><span class="${cl}" style="font-size:16px;font-weight:600">${s}</span></div>`});
+
+  // 合計集計
+  const totMap={};
+  filtered.forEach(s=>s.players.forEach(p=>{
+    if(!totMap[p.id])totMap[p.id]={name:p.name,total:0,count:0};
+    totMap[p.id].total+=p.stack-INIT;totMap[p.id].count++;
+  }));
+  const ranked=Object.values(totMap).sort((a,b)=>b.total-a.total);
+
+  // 合計ブロック（順位付き）
+  let html=`<div class="summ-block">
+    <div class="summ-hd"><span style="font-size:15px">🏆</span><span class="summ-hd-title">総合ランキング</span><span class="summ-hd-sub">${filtered.length}セッション</span></div>`;
+  ranked.forEach((t,idx)=>{
+    const r=idx+1;
+    const rc=r===1?'rank-1':r===2?'rank-2':r===3?'rank-3':'rank-n';
+    const cl=t.total>0?'dpos':t.total<0?'dneg':'dzero';
+    const s=t.total>0?'+'+t.total.toLocaleString():t.total.toLocaleString();
+    const medal=r===1?'🥇':r===2?'🥈':r===3?'🥉':'';
+    html+=`<div class="rank-row"><div class="rank-badge ${rc}">${r}</div><span style="font-size:14px;flex:1">${medal}${t.name} <span style="font-size:11px;color:var(--pk-hint)">${t.count}回</span></span><span class="${cl}" style="font-size:16px;font-weight:700">${s}</span></div>`;
+  });
   html+='</div>';
-  filtered.sort((a,b)=>b.date.localeCompare(a.date)).forEach(s=>{
-    html+=`<div class="card"><div class="ch">${s.date}</div><div>`;
-    s.players.forEach(p=>{const diff=p.stack-INIT;const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();html+=`<div class="li"><span style="font-size:14px;color:var(--pk-text)">${p.name}</span><div style="text-align:right"><span style="font-size:14px;color:var(--pk-text)">${p.stack.toLocaleString()}</span> <span class="${cl}" style="font-size:12px">${ds}</span></div></div>`});
-    if(s.loans&&s.loans.length){html+=`<div style="padding:10px 14px;border-top:1px solid var(--pk-border);background:var(--pk-surface2)">`;s.loans.forEach(l=>{const fn=l.from==='__inv__'?'在庫':s.players.find(p=>p.id===l.from)?.name||'?';const tn=s.players.find(p=>p.id===l.to)?.name||'?';html+=`<div style="font-size:12px;color:var(--pk-muted);padding:2px 0">${fn} → ${tn}: ${l.amount.toLocaleString()}</div>`});html+='</div>'}
+
+  // セッション履歴
+  [...filtered].sort((a,b)=>b.date.localeCompare(a.date)).forEach(s=>{
+    const isSel=selectedIds.has(s.id);
+    const isSettled=s.settled===true;
+    const badge=isSettled?'<span class="badge badge-settled">精算済</span>':'<span class="badge badge-pending">未精算</span>';
+    let actions='';
+    if(editMode){
+      const sLabel=isSettled?'未精算に戻す':'精算済にする';
+      const sColor=isSettled?'color:#e06060;border-color:var(--pk-red-dim);background:rgba(201,64,64,0.08)':'color:#4ecf8a;border-color:rgba(26,158,94,0.35);background:rgba(26,158,94,0.08)';
+      actions=`<div class="edit-actions">
+        <button class="eab" style="${sColor}" onclick="toggleSettled('${s.id}')">${sLabel}</button>
+        <button class="eab" style="color:#5b9bd5;border-color:rgba(91,155,213,0.35);background:rgba(91,155,213,0.08)" onclick="openExtModal('${s.id}')">抽出</button>
+        <button class="eab" style="color:#a880e0;border-color:rgba(168,128,224,0.35);background:rgba(168,128,224,0.08)" onclick="openSEditModal('${s.id}')">編集</button>
+        <button class="eab" style="color:var(--pk-red);border-color:var(--pk-red-dim);background:rgba(201,64,64,0.08)" onclick="deleteSess('${s.id}')">削除</button>
+      </div>`;
+    }
+    html+=`<div class="${'sess-card'+(isSel?' chk-on':'')}" id="scard-${s.id}">
+      <div class="sess-hd">
+        <div class="${'sess-chk'+(isSel?' on':'')}" id="chk-${s.id}" onclick="toggleSel('${s.id}')">
+          <svg viewBox="0 0 12 12"><polyline points="1,6 4,10 11,2"/></svg>
+        </div>
+        <span class="sess-date">${s.date}</span>${badge}${actions}
+      </div><div>`;
+    s.players.forEach(p=>{const diff=p.stack-INIT;const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();html+=`<div class="li"><span style="font-size:14px">${p.name}</span><div style="text-align:right"><span style="font-size:14px">${p.stack.toLocaleString()}</span> <span class="${cl}" style="font-size:12px">${ds}</span></div></div>`});
+    if(s.loans&&s.loans.length){html+='<div style="padding:8px 14px;border-top:1px solid var(--pk-border);background:var(--pk-surface2)">';s.loans.forEach(l=>{const fn=l.from==='__inv__'?'在庫':s.players.find(p=>p.id===l.from)?.name||'?';const tn=s.players.find(p=>p.id===l.to)?.name||'?';html+=`<div style="font-size:12px;color:var(--pk-muted);padding:2px 0">${fn} → ${tn}: ${l.amount.toLocaleString()}</div>`});html+='</div>'}
     html+='</div></div>';
   });
-  el.innerHTML=html;
+  el.innerHTML=html;updateSelBar();
+}
+
+function toggleSel(id){
+  if(selectedIds.has(id))selectedIds.delete(id);else selectedIds.add(id);
+  const card=document.getElementById('scard-'+id);
+  const chk=document.getElementById('chk-'+id);
+  if(card)card.className='sess-card'+(selectedIds.has(id)?' chk-on':'');
+  if(chk)chk.className='sess-chk'+(selectedIds.has(id)?' on':'');
+  updateSelBar();
+}
+function updateSelBar(){
+  const bar=document.getElementById('sel-bar');
+  const cnt=selectedIds.size;
+  bar.classList.toggle('show',cnt>0);
+  if(cnt>0)document.getElementById('sel-bar-txt').textContent=cnt+'件選択中';
+}
+function showSummModal(){
+  if(!selectedIds.size)return;
+  const sel=sessions.filter(s=>selectedIds.has(s.id));
+  const totMap={};
+  sel.forEach(s=>s.players.forEach(p=>{
+    if(!totMap[p.id])totMap[p.id]={name:p.name,total:0,count:0};
+    totMap[p.id].total+=p.stack-INIT;totMap[p.id].count++;
+  }));
+  const ranked=Object.values(totMap).sort((a,b)=>b.total-a.total);
+  document.getElementById('summ-sub').textContent=sel.length+'セッション選択中';
+  let html='';
+  ranked.forEach((t,idx)=>{
+    const r=idx+1;const rc=r===1?'rank-1':r===2?'rank-2':r===3?'rank-3':'rank-n';
+    const cl=t.total>0?'dpos':t.total<0?'dneg':'dzero';const s=t.total>0?'+'+t.total.toLocaleString():t.total.toLocaleString();
+    const medal=r===1?'🥇':r===2?'🥈':r===3?'🥉':'';
+    html+=`<div class="rank-row" style="padding:10px 4px"><div class="rank-badge ${rc}">${r}</div><span style="font-size:14px;flex:1">${medal}${t.name} <span style="font-size:11px;color:var(--pk-hint)">${t.count}回</span></span><span class="${cl}" style="font-size:16px;font-weight:700">${s}</span></div>`;
+  });
+  document.getElementById('summ-body').innerHTML=html;
+  document.getElementById('summ-modal').classList.add('open');
+}
+function closeSummModal(){document.getElementById('summ-modal').classList.remove('open')}
+
+async function toggleSettled(id){
+  if(!editMode)return;
+  const s=sessions.find(x=>x.id===id);if(!s)return;
+  const v=!(s.settled===true);
+  try{setSync('busy','更新中...');await sbUpd('sessions',id,{settled:v});s.settled=v;setSync('ok','更新完了');runSearch()}
+  catch(e){setSync('err','更新失敗');alert('更新失敗:\n'+e.message)}
+}
+async function deleteSess(id){
+  if(!editMode)return;
+  if(!confirm('このセッションを削除しますか？\n元に戻せません。'))return;
+  try{setSync('busy','削除中...');await sbDel('sessions',id);sessions=sessions.filter(s=>s.id!==id);selectedIds.delete(id);setSync('ok','削除完了');runSearch()}
+  catch(e){setSync('err','削除失敗');alert('削除失敗:\n'+e.message)}
+}
+function openExtModal(id){
+  if(!editMode)return;
+  extSessId=id;const s=sessions.find(x=>x.id===id);if(!s)return;
+  document.getElementById('ext-sub').textContent=s.date+' — 各プレイヤーから取り出す額を入力';
+  let html='';
+  s.players.forEach((p,i)=>{
+    const diff=p.stack-INIT;const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
+    html+=`<div class="ext-row"><div><div style="font-size:14px;font-weight:500">${p.name}</div><div style="font-size:11px;margin-top:2px" class="${cl}">${p.stack.toLocaleString()} (${ds})</div></div><input type="number" id="ext-${i}" class="ext-input" value="0" inputmode="numeric" placeholder="0"></div>`;
+  });
+  document.getElementById('ext-body').innerHTML=html;
+  document.getElementById('ext-modal').classList.add('open');
+}
+function closeExtModal(){document.getElementById('ext-modal').classList.remove('open');extSessId=null}
+async function applyExtract(){
+  const s=sessions.find(x=>x.id===extSessId);if(!s)return;
+  const newPlayers=s.players.map((p,i)=>({...p,stack:p.stack-(parseInt(document.getElementById('ext-'+i)?.value)||0)}));
+  const changes=newPlayers.filter((p,i)=>p.stack!==s.players[i].stack).map((p,i_)=>{const i=newPlayers.indexOf(p);return`${s.players[i].name}: ${s.players[i].stack.toLocaleString()} → ${p.stack.toLocaleString()}`});
+  if(!changes.length){alert('変更なし');return}
+  if(!confirm(changes.join('\n')+'\n\n適用しますか？'))return;
+  try{setSync('busy','保存中...');await sbUpd('sessions',extSessId,{players:newPlayers});s.players=newPlayers;setSync('ok','保存完了');closeExtModal();runSearch()}
+  catch(e){setSync('err','保存失敗');alert('保存失敗:\n'+e.message)}
+}
+function openSEditModal(id){
+  if(!editMode)return;
+  seditId=id;const s=sessions.find(x=>x.id===id);if(!s)return;
+  document.getElementById('sedit-title').textContent='セッション編集 — '+s.date;
+  let html='';
+  s.players.forEach((p,i)=>{
+    const diff=p.stack-INIT;const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
+    html+=`<div style="margin-bottom:12px"><div class="lbl">${p.name} <span class="${cl}" style="font-size:11px">${ds}</span></div><input type="number" id="sedit-${i}" class="ti" value="${p.stack}" inputmode="numeric" style="font-size:15px"></div>`;
+  });
+  document.getElementById('sedit-body').innerHTML=html;
+  document.getElementById('sedit-modal').classList.add('open');
+}
+function closeSEditModal(){document.getElementById('sedit-modal').classList.remove('open');seditId=null}
+async function saveSessEdit(){
+  const s=sessions.find(x=>x.id===seditId);if(!s)return;
+  const newPlayers=s.players.map((p,i)=>({...p,stack:parseInt(document.getElementById('sedit-'+i)?.value)||p.stack}));
+  try{setSync('busy','保存中...');await sbUpd('sessions',seditId,{players:newPlayers});s.players=newPlayers;setSync('ok','保存完了');closeSEditModal();runSearch()}
+  catch(e){setSync('err','保存失敗');alert('保存失敗:\n'+e.message)}
 }
 
 function renderMaster(){
   const el=document.getElementById('master-list');
   if(!participants.length){el.innerHTML='<div class="empty">参加者がいません</div>';return}
-  el.innerHTML=participants.map((p,i)=>{const[bg,fg]=gc(i);return`<div class="li"><div class="row" style="gap:12px"><div class="av-lg" style="background:${bg};color:${fg};border-color:${fg}50">${ini(p.name)}</div><span style="font-size:15px;color:var(--pk-text)">${p.name}</span></div><div class="row" style="gap:8px"><button class="btn" style="padding:8px 14px;font-size:13px;width:auto;min-height:44px" onclick="openEdit('${p.id}')">編集</button><button class="btn btn-red" style="padding:8px 14px;font-size:13px;width:auto;min-height:44px" onclick="delP('${p.id}')">削除</button></div></div>`}).join('');
+  el.innerHTML=participants.map((p,i)=>{const[bg,fg]=gc(i);return`<div class="li"><div class="row" style="gap:12px"><div class="av-lg" style="background:${bg};color:${fg};border-color:${fg}50">${ini(p.name)}</div><span style="font-size:15px">${p.name}</span></div><div class="row" style="gap:8px"><button class="btn" style="padding:8px 14px;font-size:13px;width:auto;min-height:44px" onclick="openEdit('${p.id}')">編集</button><button class="btn btn-red" style="padding:8px 14px;font-size:13px;width:auto;min-height:44px" onclick="delP('${p.id}')">削除</button></div></div>`}).join('');
 }
 async function addP(){
   const n=document.getElementById('new-name').value.trim();if(!n)return;
