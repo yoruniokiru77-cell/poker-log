@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -117,9 +116,69 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .ext-row:last-child{border-bottom:none}
 .ext-input{width:96px;padding:9px 10px;border:1px solid var(--pk-border2);border-radius:9px;background:var(--pk-surface2);color:var(--pk-text);font-family:inherit;font-size:15px;text-align:right;-webkit-appearance:none;-webkit-text-fill-color:var(--pk-text);outline:none}
 .ext-input:focus{border-color:var(--pk-gold)}
+
+/* ===== ログイン画面 ===== */
+.login-screen{position:fixed;inset:0;background:var(--pk-bg);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;max-width:430px;margin:0 auto}
+.login-logo{font-size:48px;margin-bottom:8px}
+.login-title{font-size:22px;font-weight:700;color:var(--pk-gold);margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--pk-muted);margin-bottom:32px}
+.player-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;margin-bottom:24px}
+.player-btn{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 8px;border:1px solid var(--pk-border2);border-radius:14px;background:var(--pk-surface);cursor:pointer;font-family:inherit;transition:all 0.15s;min-height:80px;justify-content:center}
+.player-btn:active{background:var(--pk-surface3);transform:scale(0.97)}
+.player-btn .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.player-btn .pn{font-size:12px;font-weight:600;color:var(--pk-text)}
+/* パスワード入力オーバーレイ */
+.pw-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:110;align-items:center;justify-content:center;padding:20px}
+.pw-overlay.open{display:flex}
+.pw-box{background:var(--pk-surface);border:1px solid var(--pk-border2);border-radius:20px;padding:28px 20px;width:100%;max-width:340px}
+.pw-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 10px}
+.pw-name{font-size:17px;font-weight:700;text-align:center;margin-bottom:4px}
+.pw-hint{font-size:12px;color:var(--pk-muted);text-align:center;margin-bottom:20px}
+.pw-error{font-size:12px;color:var(--pk-red);text-align:center;margin-bottom:8px;min-height:18px}
+/* ユーザーバー */
+.user-bar{display:flex;align-items:center;gap:8px;padding:7px 14px;background:rgba(201,168,76,0.07);border-bottom:1px solid var(--pk-gold-dim);font-size:12px}
+.user-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.user-name{color:var(--pk-gold);font-weight:600;flex:1}
+.logout-btn{font-size:11px;color:var(--pk-muted);background:none;border:1px solid var(--pk-border2);border-radius:6px;padding:3px 8px;cursor:pointer;font-family:inherit}
+.admin-badge{font-size:10px;background:rgba(201,168,76,0.15);color:var(--pk-gold);border:1px solid var(--pk-gold-dim);border-radius:20px;padding:1px 7px}
 </style>
 </head>
 <body>
+
+
+<!-- ログイン画面 -->
+<div id="login-screen" class="login-screen">
+  <div class="login-logo">♠</div>
+  <div class="login-title">Poker Log</div>
+  <div class="login-sub">名前をタップしてログイン</div>
+  <div class="player-grid" id="login-player-grid">
+    <div class="loading" style="grid-column:1/-1">読み込み中...</div>
+  </div>
+  <div style="font-size:11px;color:var(--pk-hint)">パスワードが必要です</div>
+</div>
+
+<!-- パスワード入力 -->
+<div class="pw-overlay" id="pw-overlay" onclick="if(event.target===this)closePwOverlay()">
+  <div class="pw-box">
+    <div class="pw-avatar" id="pw-avatar"></div>
+    <div class="pw-name" id="pw-name"></div>
+    <div class="pw-hint">パスワードを入力してください</div>
+    <div class="pw-error" id="pw-error"></div>
+    <input type="password" id="pw-input" class="ti" placeholder="パスワード" style="margin-bottom:12px;font-size:18px;letter-spacing:0.2em" oninput="document.getElementById('pw-error').textContent=''">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="btn" onclick="closePwOverlay()">キャンセル</button>
+      <button class="btn btn-gold" onclick="doLogin()">ログイン</button>
+    </div>
+  </div>
+</div>
+
+<!-- ユーザーバー（ログイン後） -->
+<div class="user-bar" id="user-bar" style="display:none">
+  <div class="user-av" id="user-av"></div>
+  <span class="user-name" id="user-name-bar"></span>
+  <span class="admin-badge" id="admin-badge" style="display:none">管理者</span>
+  <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+</div>
 
 <div id="s-home" class="screen active">
   <div class="ph"><div><h1>♠ Poker Log</h1><div class="ph-sub">共有収支管理</div></div></div>
@@ -163,7 +222,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 <div id="s-search" class="screen">
   <div class="ph" style="justify-content:space-between">
     <h1>検索</h1>
-    <button id="etbtn" class="etbtn etbtn-off" onclick="toggleEditMode()">✏️ 編集</button>
+    <button id="etbtn" class="etbtn etbtn-off" onclick="toggleEditMode()" style="display:none">✏️ 編集</button>
   </div>
   <div class="sync-bar"><div class="sdot" id="sdot2"></div><span id="sstat2">-</span></div>
   <div class="edit-mode-bar" id="edit-mode-bar">
@@ -183,8 +242,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
   <div class="ph"><h1>参加者</h1></div>
   <div class="sync-bar"><div class="sdot" id="sdot3"></div><span id="sstat3">-</span></div>
   <div style="height:12px"></div>
-  <div class="card"><div class="ch">新規追加</div><div class="cb" style="display:flex;gap:10px">
-    <input type="text" id="new-name" class="ti" placeholder="名前を入力" style="flex:1">
+  <div class="card"><div class="ch">新規追加</div><div class="cb" style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end">
+    <input type="text" id="new-name" class="ti" placeholder="名前" style="flex:1"><input type="password" id="new-pw" class="ti" placeholder="パスワード" style="flex:1;margin-top:0">
     <button class="btn btn-gold" style="width:auto;padding:13px 18px;white-space:nowrap" onclick="addP()">追加</button>
   </div></div>
   <div class="card" style="padding:0"><div id="master-list"><div class="loading">読み込み中...</div></div></div>
@@ -217,6 +276,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <button class="btn" onclick="closeEdit()">キャンセル</button>
       <button class="btn btn-gold" onclick="saveEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- PW変更モーダル -->
+<div id="pw-edit-overlay" class="overlay" onclick="if(event.target===this)closePwEdit()">
+  <div class="sheet">
+    <div class="mhandle"></div>
+    <div style="font-size:15px;font-weight:600;color:var(--pk-gold);margin-bottom:4px">パスワード変更</div>
+    <div style="font-size:12px;color:var(--pk-muted);margin-bottom:14px" id="pw-edit-name"></div>
+    <input type="password" id="pw-edit-input" class="ti" placeholder="新しいパスワード" style="margin-bottom:12px;font-size:16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <button class="btn" onclick="closePwEdit()">キャンセル</button>
+      <button class="btn btn-gold" onclick="savePwEdit()">保存</button>
     </div>
   </div>
 </div>
@@ -287,6 +361,12 @@ const AVC=[['#2a1f0a','#c9a84c'],['#0a1f14','#4ecf8a'],['#1a0a0a','#e06060'],['#
 function gc(i){return AVC[i%AVC.length]}
 function ini(n){return(n||'').slice(0,2).toUpperCase()}
 
+
+// ===== 認証 =====
+const ADMIN_NAME = '坂場';
+let currentUser = null; // {id, name, password, isAdmin}
+let loginTarget = null; // ログイン試行中のplayer
+
 let participants=[],sessions=[],cur={players:[],loans:[]};
 let chipTarget=null,editingId=null;
 let editMode=false,selectedIds=new Set(),extSessId=null,seditId=null;
@@ -304,8 +384,114 @@ async function load(){
     sessions=await sbGet('sessions','select=*&order=date.desc,created_at.desc');
     setSync('ok','共有データに接続済');
   }catch(e){setSync('err','接続エラー: '+e.message);alert('接続エラー:\n'+e.message)}
-  renderChips();renderMaster();
+  renderLoginScreen();
+  // ログイン済みの場合は直接メイン画面へ
+  const saved = sessionStorage.getItem('pk_user');
+  if(saved){
+    try{
+      currentUser = JSON.parse(saved);
+      showMainApp();
+    }catch(e){ showLoginScreen(); }
+  } else {
+    showLoginScreen();
+  }
 }
+
+
+// ===== 認証関連 =====
+function renderLoginScreen(){
+  const grid = document.getElementById('login-player-grid');
+  if(!participants.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--pk-hint);font-size:13px">参加者未登録</div>';
+    return;
+  }
+  grid.innerHTML = participants.map((p,i)=>{
+    const[bg,fg]=gc(i);
+    return `<button class="player-btn" onclick="openPwOverlay('${p.id}')">
+      <div class="av" style="background:${bg};color:${fg};border:1.5px solid ${fg}50">${ini(p.name)}</div>
+      <div class="pn">${p.name}</div>
+    </button>`;
+  }).join('');
+}
+
+function showLoginScreen(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('user-bar').style.display='none';
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+}
+
+function showMainApp(){
+  document.getElementById('login-screen').style.display='none';
+  // ユーザーバー表示
+  const bar = document.getElementById('user-bar');
+  bar.style.display='flex';
+  const i = participants.findIndex(p=>p.id===currentUser.id);
+  const[bg,fg]=gc(i<0?0:i);
+  document.getElementById('user-av').style.cssText=`background:${bg};color:${fg};border:1px solid ${fg}50`;
+  document.getElementById('user-av').textContent=ini(currentUser.name);
+  document.getElementById('user-name-bar').textContent=currentUser.name;
+  const adminBadge = document.getElementById('admin-badge');
+  adminBadge.style.display = currentUser.isAdmin ? 'inline' : 'none';
+  // メイン画面へ
+  navTo('home');
+  renderChips();
+  renderMaster();
+}
+
+function openPwOverlay(playerId){
+  loginTarget = participants.find(p=>p.id===playerId);
+  if(!loginTarget)return;
+  const i = participants.findIndex(p=>p.id===playerId);
+  const[bg,fg]=gc(i<0?0:i);
+  const av = document.getElementById('pw-avatar');
+  av.textContent=ini(loginTarget.name);
+  av.style.cssText=`background:${bg};color:${fg};border:2px solid ${fg}50;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 10px`;
+  document.getElementById('pw-name').textContent=loginTarget.name;
+  document.getElementById('pw-error').textContent='';
+  document.getElementById('pw-input').value='';
+  document.getElementById('pw-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('pw-input').focus(),200);
+}
+
+function closePwOverlay(){
+  document.getElementById('pw-overlay').classList.remove('open');
+  loginTarget=null;
+}
+
+function doLogin(){
+  if(!loginTarget)return;
+  const entered = document.getElementById('pw-input').value;
+  const correct = loginTarget.password || '';
+  if(entered !== correct){
+    document.getElementById('pw-error').textContent='パスワードが違います';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+    return;
+  }
+  currentUser = {
+    id: loginTarget.id,
+    name: loginTarget.name,
+    isAdmin: loginTarget.name === ADMIN_NAME
+  };
+  sessionStorage.setItem('pk_user', JSON.stringify(currentUser));
+  closePwOverlay();
+  showMainApp();
+}
+
+function doLogout(){
+  if(!confirm('ログアウトしますか？'))return;
+  currentUser = null;
+  sessionStorage.removeItem('pk_user');
+  showLoginScreen();
+  renderLoginScreen();
+}
+
+// パスワードフィールドでEnterキー
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && document.getElementById('pw-overlay').classList.contains('open')){
+    doLogin();
+  }
+});
 
 function navTo(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -313,6 +499,9 @@ function navTo(name){
   document.getElementById('s-'+name).classList.add('active');
   document.getElementById('nav-'+name).classList.add('active');
   window.scrollTo(0,0);
+  // 管理者のみ編集ボタン表示
+  const etbtn = document.getElementById('etbtn');
+  if(etbtn) etbtn.style.display = (currentUser&&currentUser.isAdmin) ? '' : 'none';
   if(name==='master')renderMaster();
   if(name==='home')renderChips();
 }
@@ -435,7 +624,14 @@ function applyChips(){
 function runSearch(){
   const from=document.getElementById('search-from').value;
   const to=document.getElementById('search-to').value;
-  const filtered=sessions.filter(s=>s.date>=from&&s.date<=to);
+  // 一般ユーザーは自分が参加したセッションのみ
+  const filtered=sessions.filter(s=>{
+    if(!s.date||s.date<from||s.date>to)return false;
+    if(currentUser&&!currentUser.isAdmin){
+      return s.players.some(p=>p.id===currentUser.id);
+    }
+    return true;
+  });
   const el=document.getElementById('search-results');
   if(!filtered.length){el.innerHTML='<div class="empty">該当セッションなし</div>';return}
 
@@ -581,14 +777,36 @@ async function saveSessEdit(){
   catch(e){setSync('err','保存失敗');alert('保存失敗:\n'+e.message)}
 }
 
+let pwEditId = null;
+function openPwEdit(id){
+  pwEditId=id;
+  const p=participants.find(x=>x.id===id);if(!p)return;
+  document.getElementById('pw-edit-name').textContent=p.name;
+  document.getElementById('pw-edit-input').value='';
+  document.getElementById('pw-edit-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('pw-edit-input').focus(),150);
+}
+function closePwEdit(){document.getElementById('pw-edit-overlay').classList.remove('open');pwEditId=null}
+async function savePwEdit(){
+  const pw=document.getElementById('pw-edit-input').value;
+  if(pw===''){if(!confirm('パスワードを空にしますか？'))return}
+  try{
+    setSync('busy','更新中...');
+    await sbUpd('players',pwEditId,{password:pw});
+    const p=participants.find(x=>x.id===pwEditId);if(p)p.password=pw;
+    setSync('ok','更新完了');closePwEdit();renderMaster();
+  }catch(e){setSync('err','更新失敗');alert('更新失敗:\n'+e.message)}
+}
+
 function renderMaster(){
   const el=document.getElementById('master-list');
   if(!participants.length){el.innerHTML='<div class="empty">参加者がいません</div>';return}
-  el.innerHTML=participants.map((p,i)=>{const[bg,fg]=gc(i);return`<div class="li"><div class="row" style="gap:12px"><div class="av-lg" style="background:${bg};color:${fg};border-color:${fg}50">${ini(p.name)}</div><span style="font-size:15px">${p.name}</span></div><div class="row" style="gap:8px"><button class="btn" style="padding:8px 14px;font-size:13px;width:auto;min-height:44px" onclick="openEdit('${p.id}')">編集</button><button class="btn btn-red" style="padding:8px 14px;font-size:13px;width:auto;min-height:44px" onclick="delP('${p.id}')">削除</button></div></div>`}).join('');
+  el.innerHTML=participants.map((p,i)=>{const[bg,fg]=gc(i);const isAdmin=currentUser&&currentUser.isAdmin;
+    return`<div class="li"><div class="row" style="gap:12px"><div class="av-lg" style="background:${bg};color:${fg};border-color:${fg}50">${ini(p.name)}</div><span style="font-size:15px">${p.name}</span>${p.password?'<span style="font-size:10px;color:var(--pk-hint);border:1px solid var(--pk-border2);border-radius:4px;padding:1px 6px">PW設定済</span>':'<span style="font-size:10px;color:var(--pk-red);border:1px solid var(--pk-red-dim);border-radius:4px;padding:1px 6px">PW未設定</span>'}</div>${isAdmin?`<div class="row" style="gap:6px"><button class="btn" style="padding:8px 10px;font-size:12px;width:auto;min-height:44px" onclick="openEdit('${p.id}')">名前</button><button class="btn" style="padding:8px 10px;font-size:12px;width:auto;min-height:44px;border-color:var(--pk-gold-dim);color:var(--pk-gold)" onclick="openPwEdit('${p.id}')">PW変更</button><button class="btn btn-red" style="padding:8px 10px;font-size:12px;width:auto;min-height:44px" onclick="delP('${p.id}')">削除</button></div>`:'<div></div>'}</div>`}).join('');
 }
 async function addP(){
   const n=document.getElementById('new-name').value.trim();if(!n)return;
-  try{setSync('busy','追加中...');const np={id:Date.now().toString(),name:n};await sbIns('players',np);participants.push(np);document.getElementById('new-name').value='';setSync('ok','共有データに接続済');renderMaster();renderChips()}
+  const pw=document.getElementById('new-pw')?.value||'';try{setSync('busy','追加中...');const np={id:Date.now().toString(),name:n,password:pw};await sbIns('players',np);participants.push(np);document.getElementById('new-name').value='';const npwEl=document.getElementById('new-pw');if(npwEl)npwEl.value='';setSync('ok','共有データに接続済');renderMaster();renderChips()}
   catch(e){setSync('err','追加失敗');alert('追加失敗:\n'+e.message)}
 }
 function openEdit(id){editingId=id;document.getElementById('edit-input').value=participants.find(x=>x.id===id).name;document.getElementById('edit-overlay').classList.add('open');setTimeout(()=>document.getElementById('edit-input').focus(),150)}
