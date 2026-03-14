@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -661,8 +660,10 @@ function runSearch(){
   // 合計集計
   const totMap={};
   filtered.forEach(s=>s.players.forEach(p=>{
-    if(!totMap[p.id])totMap[p.id]={name:p.name,total:0,count:0};
-    totMap[p.id].total+=calcDiff(p.stack,s.date);totMap[p.id].count++;
+    if(!totMap[p.id])totMap[p.id]={name:p.name,total:0,count:0,dates:new Set()};
+    totMap[p.id].total+=calcDiff(p.stack,s.date);
+    totMap[p.id].dates.add(s.date);
+    totMap[p.id].count=totMap[p.id].dates.size;
   }));
   const ranked=Object.values(totMap).sort((a,b)=>b.total-a.total);
 
@@ -746,8 +747,10 @@ function showSummModal(){
   const sel=sessions.filter(s=>selectedIds.has(s.id));
   const totMap={};
   sel.forEach(s=>s.players.forEach(p=>{
-    if(!totMap[p.id])totMap[p.id]={name:p.name,total:0,count:0};
-    totMap[p.id].total+=calcDiff(p.stack,s.date);totMap[p.id].count++;
+    if(!totMap[p.id])totMap[p.id]={name:p.name,total:0,count:0,dates:new Set()};
+    totMap[p.id].total+=calcDiff(p.stack,s.date);
+    totMap[p.id].dates.add(s.date);
+    totMap[p.id].count=totMap[p.id].dates.size;
   }));
   const ranked=Object.values(totMap).sort((a,b)=>b.total-a.total);
   document.getElementById('summ-sub').textContent=sel.length+'セッション選択中';
