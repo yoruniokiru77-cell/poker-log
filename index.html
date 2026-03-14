@@ -357,6 +357,7 @@ async function sbDel(t,id){const r=await fetch(`${SB_URL}/rest/v1/${t}?id=eq.${e
 
 const INIT=30000;
 const INIT_YEN=15000;
+function initYen(s){return s.date>='2026-03-13'?INIT_YEN:INIT;}
 const CHIPS=[{v:5000,c:'#e06060'},{v:1000,c:'#5b9bd5'},{v:500,c:'#4ecf8a'},{v:100,c:'#e8b84b'},{v:50,c:'#888'}];
 const AVC=[['#2a1f0a','#c9a84c'],['#0a1f14','#4ecf8a'],['#1a0a0a','#e06060'],['#0a0f1f','#5b9bd5'],['#1a0a1f','#a880e0'],['#0f1a0a','#7ecf50'],['#1f0a10','#e06070'],['#0a1a1a','#50c8c0']];
 function gc(i){return AVC[i%AVC.length]}
@@ -640,7 +641,7 @@ function runSearch(){
   const totMap={};
   filtered.forEach(s=>s.players.forEach(p=>{
     if(!totMap[p.id])totMap[p.id]={name:p.name,total:0,count:0};
-    totMap[p.id].total+=p.stack-INIT_YEN;totMap[p.id].count++;
+    totMap[p.id].total+=p.stack-initYen(s);totMap[p.id].count++;
   }));
   const ranked=Object.values(totMap).sort((a,b)=>b.total-a.total);
 
@@ -698,7 +699,7 @@ function runSearch(){
         </div>
         <span class="sess-date">${s.date}</span>${badge}${actions}
       </div><div>`;
-    s.players.forEach(p=>{const diff=p.stack-INIT_YEN;const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();html+=`<div class="li"><span style="font-size:14px">${p.name}</span><div style="text-align:right"><span style="font-size:14px">${p.stack.toLocaleString()}</span> <span class="${cl}" style="font-size:12px">${ds}</span></div></div>`});
+    s.players.forEach(p=>{const diff=p.stack-initYen(s);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();html+=`<div class="li"><span style="font-size:14px">${p.name}</span><div style="text-align:right"><span style="font-size:14px">${p.stack.toLocaleString()}</span> <span class="${cl}" style="font-size:12px">${ds}</span></div></div>`});
     if(s.loans&&s.loans.length){html+='<div style="padding:8px 14px;border-top:1px solid var(--pk-border);background:var(--pk-surface2)">';s.loans.forEach(l=>{const fn=l.from==='__inv__'?'在庫':s.players.find(p=>p.id===l.from)?.name||'?';const tn=s.players.find(p=>p.id===l.to)?.name||'?';html+=`<div style="font-size:12px;color:var(--pk-muted);padding:2px 0">${fn} → ${tn}: ${l.amount.toLocaleString()}</div>`});html+='</div>'}
     html+='</div></div>';
   });
@@ -725,7 +726,7 @@ function showSummModal(){
   const totMap={};
   sel.forEach(s=>s.players.forEach(p=>{
     if(!totMap[p.id])totMap[p.id]={name:p.name,total:0,count:0};
-    totMap[p.id].total+=p.stack-INIT_YEN;totMap[p.id].count++;
+    totMap[p.id].total+=p.stack-initYen(s);totMap[p.id].count++;
   }));
   const ranked=Object.values(totMap).sort((a,b)=>b.total-a.total);
   document.getElementById('summ-sub').textContent=sel.length+'セッション選択中';
@@ -760,7 +761,7 @@ function openExtModal(id){
   document.getElementById('ext-sub').textContent=s.date+' — 各プレイヤーから取り出す額を入力';
   let html='';
   s.players.forEach((p,i)=>{
-    const diff=p.stack-INIT_YEN;const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
+    const diff=p.stack-initYen(s);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
     html+=`<div class="ext-row"><div><div style="font-size:14px;font-weight:500">${p.name}</div><div style="font-size:11px;margin-top:2px" class="${cl}">${p.stack.toLocaleString()} (${ds})</div></div><input type="number" id="ext-${i}" class="ext-input" value="0" inputmode="numeric" placeholder="0"></div>`;
   });
   document.getElementById('ext-body').innerHTML=html;
@@ -782,7 +783,7 @@ function openSEditModal(id){
   document.getElementById('sedit-title').textContent='セッション編集 — '+s.date;
   let html='';
   s.players.forEach((p,i)=>{
-    const diff=p.stack-INIT_YEN;const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
+    const diff=p.stack-initYen(s);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
     html+=`<div style="margin-bottom:12px"><div class="lbl">${p.name} <span class="${cl}" style="font-size:11px">${ds}</span></div><input type="number" id="sedit-${i}" class="ti" value="${p.stack}" inputmode="numeric" style="font-size:15px"></div>`;
   });
   document.getElementById('sedit-body').innerHTML=html;
