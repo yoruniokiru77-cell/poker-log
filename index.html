@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -235,6 +236,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
     <div><div class="lbl">From</div><input type="date" id="search-from" class="ti"></div>
     <div><div class="lbl">To</div><input type="date" id="search-to" class="ti"></div>
     <button class="btn btn-gold" onclick="runSearch()">検索</button>
+    <button class="btn" onclick="clearSearchDate()" style="background:var(--pk-surface2);color:var(--pk-muted);border:1px solid var(--pk-border)">クリア</button>
   </div></div>
   <div id="search-results"></div>
 </div>
@@ -380,7 +382,7 @@ async function load(){
   setSync('busy','接続中...');
   const today=new Date().toISOString().split('T')[0];
   document.getElementById('session-date').value=today;
-  document.getElementById('search-from').value=today.slice(0,7)+'-01';
+  document.getElementById('search-from').value=today;
   document.getElementById('search-to').value=today;
   try{
     participants=await sbGet('players','select=*&order=created_at.asc');
@@ -435,8 +437,20 @@ function showMainApp(){
   document.getElementById('user-name-bar').textContent=currentUser.name;
   const adminBadge = document.getElementById('admin-badge');
   adminBadge.style.display = currentUser.isAdmin ? 'inline' : 'none';
+  // 管理者以外は入力・参加者タブをグレーアウト
+  const isAdmin = currentUser.isAdmin;
+  const navHome = document.getElementById('nav-home');
+  const navMaster = document.getElementById('nav-master');
+  if(!isAdmin){
+    navHome.disabled=true;navHome.style.opacity='0.3';navHome.style.cursor='not-allowed';navHome.onclick=null;
+    navMaster.disabled=true;navMaster.style.opacity='0.3';navMaster.style.cursor='not-allowed';navMaster.onclick=null;
+  } else {
+    navHome.disabled=false;navHome.style.opacity='';navHome.style.cursor='';navHome.onclick=()=>navTo('home');
+    navMaster.disabled=false;navMaster.style.opacity='';navMaster.style.cursor='';navMaster.onclick=()=>navTo('master');
+  }
   // メイン画面へ
-  navTo('home');
+  const startScreen = isAdmin ? 'home' : 'search';
+  navTo(startScreen);
   renderChips();
   renderMaster();
 }
@@ -624,6 +638,12 @@ function applyChips(){
 }
 
 // ===== 検索 =====
+function clearSearchDate(){
+  const today=new Date().toISOString().slice(0,10);
+  document.getElementById('search-from').value=today;
+  document.getElementById('search-to').value=today;
+  runSearch();
+}
 function runSearch(){
   const from=document.getElementById('search-from').value;
   const to=document.getElementById('search-to').value;
