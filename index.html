@@ -802,7 +802,7 @@ function openExtModal(id){
     const diff=calcDiff(p.stack,s.date);
     if(diff===0)return; // 差分ゼロの人はスキップ
     const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
-    html+=`<div class="ext-row" data-idx="${i}"><div><div style="font-size:14px;font-weight:500">${p.name}</div><div style="font-size:11px;margin-top:2px" class="${cl}">${ds}円</div></div><input type="number" id="ext-${i}" class="ext-input" value="0" inputmode="numeric" placeholder="0"></div>`;
+    html+=`<div class="ext-row" data-idx="${i}"><div><div style="font-size:14px;font-weight:500">${p.name}</div><div style="font-size:11px;margin-top:2px" class="${cl}">${ds}円</div></div><input type="text" inputmode="decimal" id="ext-${i}" class="ext-input" value="0" placeholder="0"></div>`;
   });
   document.getElementById('ext-body').innerHTML=html;
   document.getElementById('ext-modal').classList.add('open');
@@ -812,7 +812,7 @@ async function applyExtract(){
   const s=sessions.find(x=>x.id===extSessId);if(!s)return;
   // 抽出額を取得（参加プレイヤーのみ）
   // 入力は円単位 → ポイントに変換（×2）
-  const extYen=s.players.map((p,i)=>parseInt(document.getElementById('ext-'+i)?.value)||0);
+  const extYen=s.players.map((p,i)=>Math.round(parseFloat(document.getElementById('ext-'+i)?.value)||0));
   const hasExt=extYen.some(a=>a!==0);
   if(!hasExt){alert('抽出額を入力してください');return}
   const extAmts=extYen.map(y=>y*2); // 円→ポイント変換
@@ -841,7 +841,7 @@ function openSEditModal(id){
   s.players.forEach((p,i)=>{
     const diff=calcDiff(p.stack,s.date);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
     // 入力欄は円単位で表示
-    html+=`<div style="margin-bottom:12px"><div class="lbl">${p.name} <span class="${cl}" style="font-size:11px">${ds}円</span></div><input type="number" id="sedit-${i}" class="ti" value="${diff}" inputmode="numeric" style="font-size:15px" placeholder="円で入力"></div>`;
+    html+=`<div style="margin-bottom:12px"><div class="lbl">${p.name} <span class="${cl}" style="font-size:11px">${ds}円</span></div><input type="text" inputmode="decimal" id="sedit-${i}" class="ti" value="${diff}" style="font-size:15px" placeholder="円で入力"></div>`;
   });
   document.getElementById('sedit-body').innerHTML=html;
   document.getElementById('sedit-modal').classList.add('open');
@@ -849,7 +849,7 @@ function openSEditModal(id){
 function closeSEditModal(){document.getElementById('sedit-modal').classList.remove('open');seditId=null}
 async function saveSessEdit(){
   const s=sessions.find(x=>x.id===seditId);if(!s)return;
-  const newPlayers=s.players.map((p,i)=>{const yen=parseInt(document.getElementById('sedit-'+i)?.value);return yen===undefined||isNaN(yen)?{...p}:{...p,stack:s.date>='2026-03-13'?INIT+yen*2:INIT+yen};});
+  const newPlayers=s.players.map((p,i)=>{const yen=Math.round(parseFloat(document.getElementById('sedit-'+i)?.value));return isNaN(yen)?{...p}:{...p,stack:s.date>='2026-03-13'?INIT+yen*2:INIT+yen};});
   try{setSync('busy','保存中...');await sbUpd('sessions',seditId,{players:newPlayers});s.players=newPlayers;setSync('ok','保存完了');closeSEditModal();runSearch()}
   catch(e){setSync('err','保存失敗');alert('保存失敗:\n'+e.message)}
 }
