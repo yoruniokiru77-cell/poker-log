@@ -721,13 +721,27 @@ function runSearch(){
         </div>
         <span class="sess-date">${s.date}</span>${badge}${actions}
       </div><div>`;
-    s.players.forEach(p=>{const diff=calcDiff(p.stack,s.date);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();html+=`<div class="li"><span style="font-size:14px">${p.name}</span><div style="text-align:right"><span style="font-size:14px">${p.stack.toLocaleString()}</span> <span class="${cl}" style="font-size:12px">${ds}</span></div></div>`});
+    // メイン: 金額のみ表示
+    html+=`<div class="sess-summary" onclick="toggleDetail('${s.id}')" style="cursor:pointer">`;
+    s.players.forEach(p=>{const diff=calcDiff(p.stack,s.date);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();html+=`<div class="li"><span style="font-size:14px">${p.name}</span><span class="${cl}" style="font-size:14px;font-weight:600">${ds}円</span></div>`;});
+    html+=`<div style="font-size:11px;color:var(--pk-hint);text-align:center;padding:4px 0">▼ スタック詳細</div></div>`;
+    // 詳細: 非表示（タップで展開）
+    html+=`<div class="sess-detail" id="detail-${s.id}" style="display:none">`;
+    s.players.forEach(p=>{const diff=calcDiff(p.stack,s.date);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();html+=`<div class="li"><span style="font-size:13px;color:var(--pk-muted)">${p.name}</span><div style="text-align:right"><span style="font-size:13px">${p.stack.toLocaleString()}pt</span> <span class="${cl}" style="font-size:12px">${ds}</span></div></div>`;});
     if(s.loans&&s.loans.length){html+='<div style="padding:8px 14px;border-top:1px solid var(--pk-border);background:var(--pk-surface2)">';s.loans.forEach(l=>{const fn=l.from==='__inv__'?'在庫':s.players.find(p=>p.id===l.from)?.name||'?';const tn=s.players.find(p=>p.id===l.to)?.name||'?';html+=`<div style="font-size:12px;color:var(--pk-muted);padding:2px 0">${fn} → ${tn}: ${l.amount.toLocaleString()}</div>`});html+='</div>'}
-    html+='</div></div>';
+    html+='</div></div></div>';
   });
   el.innerHTML=html;updateSelBar();
 }
 
+function toggleDetail(id){
+  const el=document.getElementById('detail-'+id);
+  if(!el)return;
+  const isOpen=el.style.display!=='none';
+  el.style.display=isOpen?'none':'block';
+  const summary=el.previousElementSibling;
+  if(summary){const hint=summary.querySelector('div:last-child');if(hint)hint.textContent=isOpen?'▼ スタック詳細':'▲ 閉じる';}
+}
 function toggleSel(id){
   if(selectedIds.has(id))selectedIds.delete(id);else selectedIds.add(id);
   const card=document.getElementById('scard-'+id);
@@ -785,8 +799,10 @@ function openExtModal(id){
   document.getElementById('ext-sub').textContent=s.date+' — 繰り越す金額（円）を入力';
   let html='';
   s.players.forEach((p,i)=>{
-    const diff=calcDiff(p.stack,s.date);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
-    html+=`<div class="ext-row"><div><div style="font-size:14px;font-weight:500">${p.name}</div><div style="font-size:11px;margin-top:2px" class="${cl}">${p.stack.toLocaleString()} (${ds})</div></div><input type="number" id="ext-${i}" class="ext-input" value="0" inputmode="numeric" placeholder="0"></div>`;
+    const diff=calcDiff(p.stack,s.date);
+    if(diff===0)return; // 差分ゼロの人はスキップ
+    const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
+    html+=`<div class="ext-row" data-idx="${i}"><div><div style="font-size:14px;font-weight:500">${p.name}</div><div style="font-size:11px;margin-top:2px" class="${cl}">${ds}円</div></div><input type="number" id="ext-${i}" class="ext-input" value="0" inputmode="numeric" placeholder="0"></div>`;
   });
   document.getElementById('ext-body').innerHTML=html;
   document.getElementById('ext-modal').classList.add('open');
@@ -824,7 +840,8 @@ function openSEditModal(id){
   let html='';
   s.players.forEach((p,i)=>{
     const diff=calcDiff(p.stack,s.date);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
-    html+=`<div style="margin-bottom:12px"><div class="lbl">${p.name} <span class="${cl}" style="font-size:11px">${ds}</span></div><input type="number" id="sedit-${i}" class="ti" value="${p.stack}" inputmode="numeric" style="font-size:15px"></div>`;
+    // 入力欄は円単位で表示
+    html+=`<div style="margin-bottom:12px"><div class="lbl">${p.name} <span class="${cl}" style="font-size:11px">${ds}円</span></div><input type="number" id="sedit-${i}" class="ti" value="${diff}" inputmode="numeric" style="font-size:15px" placeholder="円で入力"></div>`;
   });
   document.getElementById('sedit-body').innerHTML=html;
   document.getElementById('sedit-modal').classList.add('open');
@@ -832,7 +849,7 @@ function openSEditModal(id){
 function closeSEditModal(){document.getElementById('sedit-modal').classList.remove('open');seditId=null}
 async function saveSessEdit(){
   const s=sessions.find(x=>x.id===seditId);if(!s)return;
-  const newPlayers=s.players.map((p,i)=>({...p,stack:parseInt(document.getElementById('sedit-'+i)?.value)||p.stack}));
+  const newPlayers=s.players.map((p,i)=>{const yen=parseInt(document.getElementById('sedit-'+i)?.value);return yen===undefined||isNaN(yen)?{...p}:{...p,stack:s.date>='2026-03-13'?INIT+yen*2:INIT+yen};});
   try{setSync('busy','保存中...');await sbUpd('sessions',seditId,{players:newPlayers});s.players=newPlayers;setSync('ok','保存完了');closeSEditModal();runSearch()}
   catch(e){setSync('err','保存失敗');alert('保存失敗:\n'+e.message)}
 }
