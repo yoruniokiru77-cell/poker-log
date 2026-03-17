@@ -589,9 +589,9 @@ function renderLoanSelects(){
 function addLoan(){
   const f=document.getElementById('loan-from').value;const t=document.getElementById('loan-to').value;const a=parseInt(document.getElementById('loan-amt').value)||0;
   if(!f||!t||!a){alert('すべて入力してください');return}if(f===t){alert('同じ人には貸せません');return}
-  cur.loans.push({from:f,to:t,amount:a,applied:false});document.getElementById('loan-amt').value='';renderLoanList();
+  cur.loans.push({from:f,to:t,amount:a,applied:false});document.getElementById('loan-amt').value='';renderLoanList();checkDiff();
 }
-function rmLoan(i){cur.loans.splice(i,1);renderLoanList()}
+function rmLoan(i){cur.loans.splice(i,1);renderLoanList();checkDiff()}
 function renderLoanList(){
   const el=document.getElementById('loan-list');
   if(!cur.loans.length){el.innerHTML='<div style="font-size:13px;color:var(--pk-hint);padding:4px 0">まだ貸し借りなし</div>';return}
@@ -613,7 +613,7 @@ async function saveSession(){
   const btn=document.getElementById('save-btn');btn.disabled=true;btn.textContent='保存中...';
   try{
     setSync('busy','保存中...');
-    const ns={id:Date.now().toString(),date:d,settled:false,players:cur.players.map(p=>({...p})),loans:cur.loans.map(l=>({...l}))};
+    const ns={id:Date.now().toString(),date:d,settled:true,players:cur.players.map(p=>({...p})),loans:cur.loans.map(l=>({...l}))};
     await sbIns('sessions',ns);sessions.unshift(ns);
     setSync('ok','保存完了');alert('登録しました！');cancelSession();
   }catch(e){setSync('err','保存失敗');alert('保存失敗:\n'+e.message);btn.disabled=false;btn.textContent='登録する'}
@@ -782,7 +782,7 @@ async function deleteSess(id){
 function openExtModal(id){
   if(!editMode)return;
   extSessId=id;const s=sessions.find(x=>x.id===id);if(!s)return;
-  document.getElementById('ext-sub').textContent=s.date+' — 各プレイヤーから取り出す額を入力';
+  document.getElementById('ext-sub').textContent=s.date+' — 繰り越す金額（円）を入力';
   let html='';
   s.players.forEach((p,i)=>{
     const diff=calcDiff(p.stack,s.date);const cl=diff>0?'dpos':diff<0?'dneg':'dzero';const ds=diff>0?'+'+diff.toLocaleString():diff.toLocaleString();
@@ -794,12 +794,28 @@ function openExtModal(id){
 function closeExtModal(){document.getElementById('ext-modal').classList.remove('open');extSessId=null}
 async function applyExtract(){
   const s=sessions.find(x=>x.id===extSessId);if(!s)return;
-  const newPlayers=s.players.map((p,i)=>({...p,stack:p.stack-(parseInt(document.getElementById('ext-'+i)?.value)||0)}));
-  const changes=newPlayers.filter((p,i)=>p.stack!==s.players[i].stack).map((p,i_)=>{const i=newPlayers.indexOf(p);return`${s.players[i].name}: ${s.players[i].stack.toLocaleString()} → ${p.stack.toLocaleString()}`});
-  if(!changes.length){alert('変更なし');return}
-  if(!confirm(changes.join('\n')+'\n\n適用しますか？'))return;
-  try{setSync('busy','保存中...');await sbUpd('sessions',extSessId,{players:newPlayers});s.players=newPlayers;setSync('ok','保存完了');closeExtModal();runSearch()}
-  catch(e){setSync('err','保存失敗');alert('保存失敗:\n'+e.message)}
+  // 抽出額を取得（参加プレイヤーのみ）
+  // 入力は円単位 → ポイントに変換（×2）
+  const extYen=s.players.map((p,i)=>parseInt(document.getElementById('ext-'+i)?.value)||0);
+  const hasExt=extYen.some(a=>a!==0);
+  if(!hasExt){alert('抽出額を入力してください');return}
+  const extAmts=extYen.map(y=>y*2); // 円→ポイント変換
+  // 精算済セッション（元データからポイント換算分を引く）
+  const settledPlayers=s.players.map((p,i)=>({...p,stack:p.stack-extAmts[i]}));
+  const lines=s.players.map((p,i)=>extYen[i]!==0?`${p.name}: ${extYen[i]>0?'+':''}${extYen[i].toLocaleString()}円`:'').filter(Boolean);
+  if(!confirm('【精算済】元データから抽出額を差し引きます\n【未精算】繰り越しデータとして新規保存します\n\n'+lines.join('\n')+'\n\n適用しますか？'))return;
+  try{
+    setSync('busy','保存中...');
+    // 元セッションを精算済で更新
+    await sbUpd('sessions',extSessId,{players:settledPlayers,settled:true});
+    s.players=settledPlayers;s.settled=true;
+    // 未精算セッションを新規作成（円×2をポイントとして INIT基準で保存）
+    const carryPlayers=s.players.map((p,i)=>({...p,stack:INIT+extAmts[i]}));
+    const carrySession={id:Date.now().toString(),date:s.date,settled:false,players:carryPlayers,loans:[]};
+    await sbIns('sessions',carrySession);
+    sessions.unshift(carrySession);
+    setSync('ok','保存完了');closeExtModal();runSearch();
+  }catch(e){setSync('err','保存失敗');alert('保存失敗:\n'+e.message)}
 }
 function openSEditModal(id){
   if(!editMode)return;
