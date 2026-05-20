@@ -943,8 +943,9 @@ const AdminView = ({session:initSession, onCounting}) => {
                         </div>
                       )}
                     </div>
-                    <Btn sm v="ghost" full={false} onClick={()=>setEditModal({sp,newName:sp.display_name,saving:false})}>
-                      ✏️
+                    <Btn sm v="ghost" full={false} onClick={()=>setEditModal({sp,newName:sp.display_name,saving:false})}
+                      style={{padding:'6px 10px',fontSize:14}}>
+                      ✏️ 修正
                     </Btn>
                   </div>
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--muted)',paddingTop:8}}>
@@ -1174,7 +1175,7 @@ const Counting = ({session, onComplete}) => {
 
 // ─── SETTLEMENT ───────────────────────────────────────────────
 
-const Settlement = ({session, isAdmin}) => {
+const Settlement = ({session, isAdmin, onBack}) => {
   const [sps,setSps] = useState([]);
   const [txs,setTxs] = useState([]);
   const [transfers,setTransfers] = useState([]);
@@ -1257,6 +1258,7 @@ const Settlement = ({session, isAdmin}) => {
   return (
     <>
       <div className="hdr">
+        {onBack && <Back onClick={onBack}/>}
         <span className="hdr-title">精算{closed?' (完了)':''}</span>
         {isAdmin && <span className="bdg bdg-admin">管理者</span>}
       </div>
@@ -1465,7 +1467,7 @@ const App = () => {
       case 'admin':   return session ? <AdminView session={session} onCounting={()=>nav('counting')}/> : null;
       case 'player':  return session&&mySpId ? <PlayerView session={session} mySpId={mySpId} onEnd={s=>{if(s==='settling')nav('settlement')}}/> : null;
       case 'counting':return session ? <Counting session={session} onComplete={()=>nav('settlement')}/> : null;
-      case 'settlement': return session ? <Settlement session={session} isAdmin={isAdmin}/> : null;
+      case 'settlement': return session ? <Settlement session={session} isAdmin={isAdmin} onBack={isAdmin?null:()=>nav('sessions')}/> : null;
       case 'unsettled': return <Unsettled onBack={()=>nav('home')}/>;
       case 'sessions':  return <SessionsList onBack={()=>nav('home')} onSelect={handleJoinByCode} onViewResult={(s)=>{setSess(s);nav('settlement')}}/>;
       case 'stats':     return <StatsPage onBack={()=>nav('home')}/>;
