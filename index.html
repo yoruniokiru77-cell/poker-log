@@ -111,7 +111,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const fy = (n) => {
   if (n === null || n === undefined) return null;
-  const s = n > 0 ? '+' : '';
+  const s = n > 0 ? '+' : n < 0 ? '-' : '';
   return s + '¥' + Math.abs(n).toLocaleString();
 };
 const fc = (n) => (n >= 0 ? '+' : '') + n.toLocaleString() + '枚';
