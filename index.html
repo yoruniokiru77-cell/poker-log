@@ -424,6 +424,7 @@ const PlayerView = ({session, mySpId, onEnd}) => {
   const [reqNote,setReqNote] = useState('');
   const [sub,setSub] = useState(false);
   const [loading,setLoading] = useState(true);
+  const [sessionStatus,setSessionStatus] = useState(session.status);
 
   const load = async () => {
     const [{data:s},{data:t}] = await Promise.all([
@@ -441,6 +442,7 @@ const PlayerView = ({session, mySpId, onEnd}) => {
     const ch = db.channel('pv_'+mySpId)
       .on('postgres_changes',{event:'*',schema:'public',table:'transactions',filter:`session_player_id=eq.${mySpId}`},load)
       .on('postgres_changes',{event:'UPDATE',schema:'public',table:'sessions',filter:`id=eq.${session.id}`},(p)=>{
+        setSessionStatus(p.new.status);
         if (['settling','closed'].includes(p.new.status)) onEnd(p.new.status);
       }).subscribe();
     return ()=>db.removeChannel(ch);
@@ -461,6 +463,24 @@ const PlayerView = ({session, mySpId, onEnd}) => {
   if (loading||!sp) return <Loading/>;
   const stats = calcStats(sp,txs,session.chip_rate);
   const pending = txs.filter(t=>t.status==='pending');
+
+  // ゲーム終了 → チップカウント中の待機画面
+  if (sessionStatus === 'counting') return (
+    <>
+      <div className="hdr"><Av name={sp.display_name} size={28}/><span className="hdr-title">{sp.display_name}</span></div>
+      <div className="page" style={{paddingTop:60,textAlign:'center'}}>
+        <div style={{fontSize:48,marginBottom:16}}>🃏</div>
+        <h2 style={{fontSize:18,fontWeight:600,marginBottom:8}}>ゲーム終了</h2>
+        <p style={{color:'var(--muted)',fontSize:14,marginBottom:20}}>管理者がチップを集計中です...<br/>しばらくお待ちください</p>
+        <div style={{display:'flex',justifyContent:'center'}}><Spin size={28}/></div>
+        <div className="card" style={{marginTop:24,textAlign:'left'}}>
+          <div className="row"><span className="row-lbl">バイイン</span><span className="row-val">{stats.buyIn}枚</span></div>
+          <div className="row"><span className="row-lbl">ネット借入</span><span className="row-val">{stats.netBorrow}枚</span></div>
+          <div className="row"><span className="row-lbl">使用合計</span><span className="row-val">{stats.buyIn+stats.netBorrow}枚</span></div>
+        </div>
+      </div>
+    </>
+  );
 
   const typeLabel = {buy_in:'バイイン',borrow:'借り入れ',repay:'返済'};
   const typeColor = {buy_in:'var(--indigo)',borrow:'var(--red)',repay:'var(--green)'};
