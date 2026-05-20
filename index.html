@@ -557,15 +557,22 @@ const JoinSession = ({session, onBack, onJoined}) => {
     if (!name.trim()) return setErr('名前を入力してください');
     setSub(true); setErr('');
     try {
-      // 新規プレイヤー作成
-      const {data:newPlayer} = await db.from('players').insert({
-        display_name:name.trim(), carry_over_balance:0
-      }).select().single();
+      // 同名プレイヤーが既存なら再利用、なければ新規作成
+      let playerId;
+      const {data:existing} = await db.from('players')
+        .select().eq('display_name',name.trim()).maybeSingle();
+      if (existing) {
+        playerId = existing.id;
+      } else {
+        const {data:newPlayer} = await db.from('players')
+          .insert({display_name:name.trim(),carry_over_balance:0}).select().single();
+        playerId = newPlayer?.id;
+      }
 
       // セッション参加（即座にactive）
       const {data,error} = await db.from('session_players').insert({
         session_id:session.id, display_name:name.trim(),
-        status:'active', player_id:newPlayer?.id, carry_over_balance:0
+        status:'active', player_id:playerId, carry_over_balance:0
       }).select().single();
       if (error) throw error;
 
@@ -783,6 +790,7 @@ const AdminView = ({session:initSession, onCounting}) => {
   const [loading,setLoading] = useState(true);
   const [linkModal,setLinkModal] = useState(null);
   const [cp,setCp] = useState(false);
+  const [editModal,setEditModal] = useState(null); // {sp, newName, saving}
 
   const load = async () => {
     const [{data:s},{data:t}] = await Promise.all([
@@ -841,6 +849,33 @@ const AdminView = ({session:initSession, onCounting}) => {
 
   const rejectTx = async (tx) => {
     await db.from('transactions').update({status:'rejected'}).eq('id',tx.id);
+    load();
+  };
+
+  const renamePlayer = async () => {
+    const {sp, newName} = editModal;
+    if (!newName.trim() || newName.trim()===sp.display_name) { setEditModal(null); return; }
+    setEditModal(e=>({...e,saving:true}));
+    const name = newName.trim();
+
+    // 同名プレイヤーが既存か確認
+    const {data:existing} = await db.from('players').select().eq('display_name',name).maybeSingle();
+
+    if (existing && existing.id !== sp.player_id) {
+      // 既存プレイヤーに統合
+      await db.from('session_players').update({
+        display_name: name,
+        player_id: existing.id,
+        carry_over_balance: existing.carry_over_balance
+      }).eq('id', sp.id);
+    } else {
+      // 名前だけ変更
+      await db.from('session_players').update({display_name: name}).eq('id', sp.id);
+      if (sp.player_id) {
+        await db.from('players').update({display_name: name}).eq('id', sp.player_id);
+      }
+    }
+    setEditModal(null);
     load();
   };
 
@@ -908,6 +943,9 @@ const AdminView = ({session:initSession, onCounting}) => {
                         </div>
                       )}
                     </div>
+                    <Btn sm v="ghost" full={false} onClick={()=>setEditModal({sp,newName:sp.display_name,saving:false})}>
+                      ✏️
+                    </Btn>
                   </div>
                   <div style={{display:'flex',justifyContent:'space-between',fontSize:12,color:'var(--muted)',paddingTop:8}}>
                     <span>買: {st.buyIn}枚</span>
@@ -1024,6 +1062,28 @@ const AdminView = ({session:initSession, onCounting}) => {
             <div style={{marginTop:8}}>
               <Btn v="primary" style={{marginBottom:8}} onClick={()=>approveJoin(linkModal,null)}>新規プレイヤーとして承認</Btn>
               <Btn v="ghost" onClick={()=>setLinkModal(null)}>キャンセル</Btn>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ── EDIT NAME MODAL ── */}
+      {editModal && (
+        <div className="overlay" onClick={()=>setEditModal(null)}>
+          <div className="sheet" onClick={e=>e.stopPropagation()}>
+            <div className="sheet-handle"/>
+            <h3 style={{fontSize:16,fontWeight:600,marginBottom:4}}>名前を修正</h3>
+            <p style={{fontSize:13,color:'var(--muted)',marginBottom:14}}>
+              同名プレイヤーが既存の場合は自動で統合されます
+            </p>
+            <div className="fld">
+              <label className="lbl">現在の名前</label>
+              <div style={{fontSize:15,fontWeight:600,padding:'8px 0',color:'var(--muted)'}}>{editModal.sp.display_name}</div>
+            </div>
+            <Inp lbl="新しい名前" value={editModal.newName}
+              onChange={v=>setEditModal(e=>({...e,newName:v}))} ph="漢字などに修正..."/>
+            <div className="gap8">
+              <Btn v="ghost" style={{flex:1}} onClick={()=>setEditModal(null)}>キャンセル</Btn>
+              <Btn v="primary" style={{flex:1}} loading={editModal.saving} onClick={renamePlayer}>保存</Btn>
             </div>
           </div>
         </div>
