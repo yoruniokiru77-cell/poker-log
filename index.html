@@ -1183,6 +1183,10 @@ const Settlement = ({session, isAdmin, onBack}) => {
   const [loading,setLoading] = useState(true);
   const [closing,setClosing] = useState(false);
   const [closed,setClosed] = useState(session.status==='closed');
+  const [editModal,setEditModal] = useState(null);
+
+  // 管理者かどうか（localStorageからも確認）
+  const canEdit = isAdmin || localStorage.getItem(`pk_admin_${session.id}`) === session.admin_token;
 
   const load = async () => {
     const [{data:s},{data:t},{data:st}] = await Promise.all([
@@ -1227,6 +1231,21 @@ const Settlement = ({session, isAdmin, onBack}) => {
     return ()=>db.removeChannel(ch);
   },[]);
 
+  const renamePlayer = async () => {
+    const {sp, newName} = editModal;
+    if (!newName.trim() || newName.trim()===sp.display_name) { setEditModal(null); return; }
+    setEditModal(e=>({...e,saving:true}));
+    const name = newName.trim();
+    const {data:existing} = await db.from('players').select().eq('display_name',name).maybeSingle();
+    if (existing && existing.id !== sp.player_id) {
+      await db.from('session_players').update({display_name:name,player_id:existing.id,carry_over_balance:existing.carry_over_balance}).eq('id',sp.id);
+    } else {
+      await db.from('session_players').update({display_name:name}).eq('id',sp.id);
+      if (sp.player_id) await db.from('players').update({display_name:name}).eq('id',sp.player_id);
+    }
+    setEditModal(null); load();
+  };
+
   const markPaid = async (tr) => {
     await db.from('settlement_transfers').update({is_paid:true}).eq('id',tr.id);
     setPaid(s=>{const n=new Set(s);n.add(tr.id);return n;});
@@ -1269,7 +1288,15 @@ const Settlement = ({session, isAdmin, onBack}) => {
             <div style={{display:'flex',alignItems:'center',gap:10}}>
               <Av name={sp.display_name}/>
               <div style={{flex:1}}>
-                <div style={{fontWeight:600,fontSize:15}}>{sp.display_name}</div>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  <span style={{fontWeight:600,fontSize:15}}>{sp.display_name}</span>
+                  {canEdit && (
+                    <button onClick={()=>setEditModal({sp,newName:sp.display_name,saving:false})}
+                      style={{background:'none',border:'none',color:'var(--muted)',cursor:'pointer',fontSize:13,padding:'2px 4px'}}>
+                      ✏️
+                    </button>
+                  )}
+                </div>
                 {sp.carryOver!==0 && (
                   <div style={{fontSize:11,color:'var(--muted)',marginTop:2}}>
                     今回{fy(sp.profitYen)} + 繰越{fy(sp.carryOver)}
@@ -1326,6 +1353,25 @@ const Settlement = ({session, isAdmin, onBack}) => {
         )}
         {closed && <div className="ok" style={{marginTop:12}}>このセッションは精算完了しました</div>}
       </div>
+
+      {editModal && (
+        <div className="overlay" onClick={()=>setEditModal(null)}>
+          <div className="sheet" onClick={e=>e.stopPropagation()}>
+            <div className="sheet-handle"/>
+            <h3 style={{fontSize:16,fontWeight:600,marginBottom:4}}>名前を修正</h3>
+            <p style={{fontSize:13,color:'var(--muted)',marginBottom:14}}>同名プレイヤーが既存の場合は自動で統合されます</p>
+            <div className="fld">
+              <label className="lbl">現在の名前</label>
+              <div style={{fontSize:15,fontWeight:600,padding:'8px 0',color:'var(--muted)'}}>{editModal.sp.display_name}</div>
+            </div>
+            <Inp lbl="新しい名前" value={editModal.newName} onChange={v=>setEditModal(e=>({...e,newName:v}))} ph="修正後の名前..."/>
+            <div className="gap8">
+              <Btn v="ghost" style={{flex:1}} onClick={()=>setEditModal(null)}>キャンセル</Btn>
+              <Btn v="primary" style={{flex:1}} loading={editModal.saving} onClick={renamePlayer}>保存</Btn>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
