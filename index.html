@@ -211,7 +211,7 @@ const AmtTag = ({yen}) => {
 
 // ─── HOME ────────────────────────────────────────────────────
 
-const Home = ({onCreate, onJoin, onUnsettled}) => {
+const Home = ({onCreate, onJoin, onUnsettled, onSessions}) => {
   const [code,setCode] = useState('');
   return (
     <div className="page" style={{paddingTop:48}}>
@@ -237,13 +237,57 @@ const Home = ({onCreate, onJoin, onUnsettled}) => {
         </div>
       </div>
 
-      <div style={{textAlign:'center',marginTop:16}}>
+      <div style={{textAlign:'center',marginTop:16,display:'flex',flexDirection:'column',gap:10}}>
         <button onClick={onUnsettled}
           style={{background:'none',border:'none',color:'var(--indigo)',fontSize:14,cursor:'pointer',fontWeight:500}}>
           未精算一覧を見る →
         </button>
+        <button onClick={onSessions}
+          style={{background:'none',border:'none',color:'var(--muted)',fontSize:14,cursor:'pointer',fontWeight:500}}>
+          セッション履歴を見る →
+        </button>
       </div>
     </div>
+  );
+};
+
+// ─── SESSIONS LIST ────────────────────────────────────────────
+
+const SessionsList = ({onBack, onSelect}) => {
+  const [sessions,setSessions] = useState([]);
+  const [loading,setLoading] = useState(true);
+
+  useEffect(()=>{
+    db.from('sessions').select().order('created_at',{ascending:false})
+      .then(({data})=>{ setSessions(data||[]); setLoading(false); });
+  },[]);
+
+  const statusLabel = {waiting:'待機中',active:'進行中',counting:'集計中',settling:'精算中',closed:'終了'};
+  const statusBdg   = {waiting:'bdg-gray',active:'bdg-active',counting:'bdg-pending',settling:'bdg-pending',closed:'bdg-gray'};
+
+  const fmt = (d) => new Date(d).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  return (
+    <>
+      <div className="hdr"><Back onClick={onBack}/><span className="hdr-title">セッション履歴</span></div>
+      <div className="page" style={{paddingTop:16}}>
+        {loading ? <Loading/> : sessions.length===0 ? (
+          <div style={{color:'var(--muted)',textAlign:'center',padding:'40px 0'}}>セッションなし</div>
+        ) : sessions.map(s=>(
+          <div key={s.id} className="card mb" style={{marginBottom:8,cursor:'pointer'}} onClick={()=>onSelect(s.id)}>
+            <div style={{display:'flex',alignItems:'center',gap:10}}>
+              <div style={{flex:1}}>
+                <div style={{fontWeight:600,fontSize:15}}>{s.name}</div>
+                <div style={{fontSize:12,color:'var(--muted)',marginTop:2}}>
+                  {fmt(s.created_at)} · ¥{s.chip_rate}/枚 · バイイン{s.buy_in_chips}枚
+                </div>
+              </div>
+              <span className={`bdg ${statusBdg[s.status]}`}>{statusLabel[s.status]}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 };
 
@@ -346,52 +390,37 @@ const JoinSession = ({session, onBack, onJoined}) => {
   const [name,setName] = useState('');
   const [sub,setSub] = useState(false);
   const [err,setErr] = useState('');
-  const [waiting,setWaiting] = useState(false);
-  const [mySpId,setMySpId] = useState(null);
-
-  useEffect(()=>{
-    const saved = localStorage.getItem(`pk_sp_${session.id}`);
-    if (saved) { setMySpId(saved); setWaiting(true); }
-  },[]);
-
-  // Watch for approval
-  useEffect(()=>{
-    if (!mySpId) return;
-    // Check immediately
-    db.from('session_players').select().eq('id',mySpId).single().then(({data})=>{
-      if (data?.status==='active') onJoined(mySpId,data.display_name);
-    });
-    const ch = db.channel('join_'+mySpId)
-      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'session_players',filter:`id=eq.${mySpId}`},(p)=>{
-        if (p.new.status==='active') onJoined(mySpId,p.new.display_name);
-      }).subscribe();
-    return ()=>db.removeChannel(ch);
-  },[mySpId]);
-
   const go = async () => {
     if (!name.trim()) return setErr('名前を入力してください');
     setSub(true); setErr('');
     try {
+      // 新規プレイヤー作成
+      const {data:newPlayer} = await db.from('players').insert({
+        display_name:name.trim(), carry_over_balance:0
+      }).select().single();
+
+      // セッション参加（即座にactive）
       const {data,error} = await db.from('session_players').insert({
-        session_id:session.id, display_name:name.trim(), status:'pending', carry_over_balance:0
+        session_id:session.id, display_name:name.trim(),
+        status:'active', player_id:newPlayer?.id, carry_over_balance:0
       }).select().single();
       if (error) throw error;
+
+      // バイイン自動記録
+      await db.from('transactions').insert({
+        session_id:session.id, session_player_id:data.id,
+        type:'buy_in', chips:session.buy_in_chips, status:'approved'
+      });
+      // 在庫更新
+      await db.from('sessions').update({
+        current_stock: session.current_stock - session.buy_in_chips
+      }).eq('id',session.id);
+
       localStorage.setItem(`pk_sp_${session.id}`,data.id);
-      setMySpId(data.id); setWaiting(true);
+      onJoined(data.id, data.display_name);
     } catch(e) { setErr('参加失敗: '+e.message); }
     setSub(false);
   };
-
-  if (waiting) return (
-    <>
-      <div className="hdr"><span className="hdr-title">{session.name}</span></div>
-      <div className="page" style={{paddingTop:60,textAlign:'center'}}>
-        <div style={{fontSize:48,marginBottom:16}}>⏳</div>
-        <h2 style={{fontSize:18,fontWeight:600,marginBottom:8}}>承認待ち</h2>
-        <p style={{color:'var(--muted)',fontSize:14}}>管理者があなたの参加を承認するまでお待ちください</p>
-      </div>
-    </>
-  );
 
   return (
     <>
@@ -673,13 +702,12 @@ const AdminView = ({session:initSession, onCounting}) => {
         <span>参加: <strong>{active.length}名</strong></span>
       </div>
 
-      {pending.length>0 && <div style={{padding:'8px 16px 0'}}><div className="warn">🔔 参加申請 {pending.length}件</div></div>}
       {pendingTxs.length>0 && <div style={{padding:'4px 16px 0'}}><div className="warn">💰 借入/返済リクエスト {pendingTxs.length}件</div></div>}
 
       <div style={{padding:'0 16px'}}>
         <div className="tabs" style={{margin:'8px -16px 0'}}>
           <div className={`tab${tab==='players'?' on':''}`} onClick={()=>setTab('players')}>
-            プレイヤー{pending.length>0?` (${pending.length})`:''}
+            プレイヤー
           </div>
           <div className={`tab${tab==='req'?' on':''}`} onClick={()=>setTab('req')}>
             リクエスト{pendingTxs.length>0?` (${pendingTxs.length})`:''}
@@ -692,20 +720,6 @@ const AdminView = ({session:initSession, onCounting}) => {
         {/* ── PLAYERS TAB ── */}
         {tab==='players' && (
           <>
-            {pending.length>0 && (
-              <>
-                <div className="sec-lbl">承認待ち</div>
-                {pending.map(sp=>(
-                  <div key={sp.id} className="card" style={{borderColor:'var(--amber)',marginBottom:8}}>
-                    <div className="pr" style={{border:'none',padding:0}}>
-                      <Av name={sp.display_name}/>
-                      <div className="pr-info"><div className="pr-name">{sp.display_name}</div><div className="pr-sub">参加申請中</div></div>
-                      <Btn sm v="primary" full={false} onClick={()=>onApprove(sp)}>承認</Btn>
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
             <div className="sec-lbl">参加中 ({active.length}名)</div>
             {active.length===0 ? (
               <div style={{color:'var(--muted)',textAlign:'center',padding:'24px 0',fontSize:14}}>まだ誰も参加していません</div>
@@ -1213,7 +1227,7 @@ const App = () => {
   const R = () => {
     switch(view) {
       case 'loading': return <div className="center"><Spin size={36}/></div>;
-      case 'home':    return <Home onCreate={()=>nav('create')} onJoin={handleJoinByCode} onUnsettled={()=>nav('unsettled')}/>;
+      case 'home':    return <Home onCreate={()=>nav('create')} onJoin={handleJoinByCode} onUnsettled={()=>nav('unsettled')} onSessions={()=>nav('sessions')}/>;
       case 'create':  return <CreateSession onBack={()=>nav('home')} onCreated={handleCreated}/>;
       case 'created': return created ? <Created session={created.session} adminToken={created.token} onAdmin={handleGoAdmin}/> : null;
       case 'join':    return session ? <JoinSession session={session} onBack={()=>nav('home')} onJoined={handleJoined}/> : null;
@@ -1222,6 +1236,7 @@ const App = () => {
       case 'counting':return session ? <Counting session={session} onComplete={()=>nav('settlement')}/> : null;
       case 'settlement': return session ? <Settlement session={session} isAdmin={isAdmin}/> : null;
       case 'unsettled': return <Unsettled onBack={()=>nav('home')}/>;
+      case 'sessions':  return <SessionsList onBack={()=>nav('home')} onSelect={handleJoinByCode}/>;
       default: return <Home onCreate={()=>nav('create')} onJoin={handleJoinByCode} onUnsettled={()=>nav('unsettled')}/>;
     }
   };
