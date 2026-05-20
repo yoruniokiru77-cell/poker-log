@@ -253,7 +253,7 @@ const Home = ({onCreate, onJoin, onUnsettled, onSessions}) => {
 
 // ─── SESSIONS LIST ────────────────────────────────────────────
 
-const SessionsList = ({onBack, onSelect}) => {
+const SessionsList = ({onBack, onSelect, onViewResult}) => {
   const [sessions,setSessions] = useState([]);
   const [loading,setLoading] = useState(true);
 
@@ -267,6 +267,11 @@ const SessionsList = ({onBack, onSelect}) => {
 
   const fmt = (d) => new Date(d).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 
+  const handleTap = (s) => {
+    if (s.status === 'closed' || s.status === 'settling') onViewResult(s);
+    else onSelect(s.id);
+  };
+
   return (
     <>
       <div className="hdr"><Back onClick={onBack}/><span className="hdr-title">セッション履歴</span></div>
@@ -274,7 +279,7 @@ const SessionsList = ({onBack, onSelect}) => {
         {loading ? <Loading/> : sessions.length===0 ? (
           <div style={{color:'var(--muted)',textAlign:'center',padding:'40px 0'}}>セッションなし</div>
         ) : sessions.map(s=>(
-          <div key={s.id} className="card mb" style={{marginBottom:8,cursor:'pointer'}} onClick={()=>onSelect(s.id)}>
+          <div key={s.id} className="card mb" style={{marginBottom:8,cursor:'pointer'}} onClick={()=>handleTap(s)}>
             <div style={{display:'flex',alignItems:'center',gap:10}}>
               <div style={{flex:1}}>
                 <div style={{fontWeight:600,fontSize:15}}>{s.name}</div>
@@ -282,7 +287,12 @@ const SessionsList = ({onBack, onSelect}) => {
                   {fmt(s.created_at)} · ¥{s.chip_rate}/枚 · バイイン{s.buy_in_chips}枚
                 </div>
               </div>
-              <span className={`bdg ${statusBdg[s.status]}`}>{statusLabel[s.status]}</span>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                {(s.status==='closed'||s.status==='settling') && (
+                  <span style={{fontSize:11,color:'var(--indigo)'}}>結果を見る</span>
+                )}
+                <span className={`bdg ${statusBdg[s.status]}`}>{statusLabel[s.status]}</span>
+              </div>
             </div>
           </div>
         ))}
@@ -426,17 +436,25 @@ const JoinSession = ({session, onBack, onJoined}) => {
     <>
       <div className="hdr"><Back onClick={onBack}/><span className="hdr-title">{session.name}</span></div>
       <div className="page" style={{paddingTop:16}}>
-        {err && <div className="err">{err}</div>}
-        <div className="card" style={{background:'var(--indigo-dim)',border:'1px solid var(--indigo)',marginBottom:20}}>
-          <div className="row"><span className="row-lbl">バイイン</span><span className="row-val">{session.buy_in_chips}枚</span></div>
-          <div className="row"><span className="row-lbl">レート</span><span className="row-val">¥{session.chip_rate}/枚</span></div>
-          <div className="row"><span className="row-lbl">バイイン金額</span>
-            <span style={{fontWeight:700,color:'var(--indigo)',fontFamily:'Outfit,sans-serif',fontSize:16}}>
-              ¥{(session.buy_in_chips*session.chip_rate).toLocaleString()}</span>
+        {['closed','settling','counting'].includes(session.status) ? (
+          <div className="info" style={{marginTop:20,textAlign:'center'}}>
+            このセッションはすでに終了しています
           </div>
-        </div>
-        <Inp lbl="あなたの名前" value={name} onChange={setName} ph="表示名を入力..."/>
-        <Btn v="primary" onClick={go} loading={sub}>参加申請する</Btn>
+        ) : (
+          <>
+            {err && <div className="err">{err}</div>}
+            <div className="card" style={{background:'var(--indigo-dim)',border:'1px solid var(--indigo)',marginBottom:20}}>
+              <div className="row"><span className="row-lbl">バイイン</span><span className="row-val">{session.buy_in_chips}枚</span></div>
+              <div className="row"><span className="row-lbl">レート</span><span className="row-val">¥{session.chip_rate}/枚</span></div>
+              <div className="row"><span className="row-lbl">バイイン金額</span>
+                <span style={{fontWeight:700,color:'var(--indigo)',fontFamily:'Outfit,sans-serif',fontSize:16}}>
+                  ¥{(session.buy_in_chips*session.chip_rate).toLocaleString()}</span>
+              </div>
+            </div>
+            <Inp lbl="あなたの名前" value={name} onChange={setName} ph="表示名を入力..."/>
+            <Btn v="primary" onClick={go} loading={sub}>参加申請する</Btn>
+          </>
+        )}
       </div>
     </>
   );
@@ -1236,7 +1254,7 @@ const App = () => {
       case 'counting':return session ? <Counting session={session} onComplete={()=>nav('settlement')}/> : null;
       case 'settlement': return session ? <Settlement session={session} isAdmin={isAdmin}/> : null;
       case 'unsettled': return <Unsettled onBack={()=>nav('home')}/>;
-      case 'sessions':  return <SessionsList onBack={()=>nav('home')} onSelect={handleJoinByCode}/>;
+      case 'sessions':  return <SessionsList onBack={()=>nav('home')} onSelect={handleJoinByCode} onViewResult={(s)=>{setSess(s);nav('settlement')}}/>;
       default: return <Home onCreate={()=>nav('create')} onJoin={handleJoinByCode} onUnsettled={()=>nav('unsettled')}/>;
     }
   };
