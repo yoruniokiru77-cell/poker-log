@@ -211,7 +211,7 @@ const AmtTag = ({yen}) => {
 
 // ─── HOME ────────────────────────────────────────────────────
 
-const Home = ({onCreate, onJoin, onUnsettled, onSessions}) => {
+const Home = ({onCreate, onJoin, onUnsettled, onSessions, onStats}) => {
   const [code,setCode] = useState('');
   return (
     <div className="page" style={{paddingTop:48}}>
@@ -246,9 +246,163 @@ const Home = ({onCreate, onJoin, onUnsettled, onSessions}) => {
           style={{background:'none',border:'none',color:'var(--muted)',fontSize:14,cursor:'pointer',fontWeight:500}}>
           セッション履歴を見る →
         </button>
+        <button onClick={onStats}
+          style={{background:'none',border:'none',color:'var(--muted)',fontSize:14,cursor:'pointer',fontWeight:500}}>
+          総合成績・ランキングを見る →
+        </button>
       </div>
     </div>
   );
+};
+
+// ─── STATS PAGE ───────────────────────────────────────────────
+
+const StatsPage = ({onBack}) => {
+  const [from,setFrom] = useState('');
+  const [to,setTo]     = useState('');
+  const [stats,setStats] = useState([]);
+  const [sessCount,setSessCount] = useState(0);
+  const [loading,setLoading] = useState(true);
+  const [expanded,setExpanded] = useState(null);
+
+  const load = async () => {
+    setLoading(true);
+    let q = db.from('sessions').select().eq('status','closed');
+    if (from) q = q.gte('created_at', from+'T00:00:00');
+    if (to)   q = q.lte('created_at', to+'T23:59:59');
+    const {data:sessions} = await q.order('created_at',{ascending:false});
+    if (!sessions?.length){ setStats([]); setSessCount(0); setLoading(false); return; }
+
+    const ids = sessions.map(s=>s.id);
+    const rateMap = {}; const nameMap = {};
+    sessions.forEach(s=>{ rateMap[s.id]=s.chip_rate; nameMap[s.id]=s.name; });
+
+    const [{data:sps},{data:txs}] = await Promise.all([
+      db.from('session_players').select().in('session_id',ids),
+      db.from('transactions').select().in('session_id',ids).eq('status','approved')
+    ]);
+
+    // player_id → 集計、なければ display_name で集計
+    const map = {};
+    (sps||[]).forEach(sp=>{
+      if (sp.final_chip_count===null) return;
+      const key = sp.player_id || ('name:'+sp.display_name);
+      if (!map[key]) map[key] = {name:sp.display_name, totalYen:0, sessions:[], wins:0};
+
+      const myTxs = (txs||[]).filter(t=>t.session_player_id===sp.id);
+      const st = calcStats(sp, myTxs, rateMap[sp.session_id]);
+      if (st.profitYen===null) return;
+
+      map[key].totalYen += st.profitYen;
+      if (st.profitYen > 0) map[key].wins++;
+      map[key].sessions.push({
+        sessionName: nameMap[sp.session_id],
+        profitYen: st.profitYen,
+        profitChips: st.profitChips,
+        buyIn: st.buyIn, netBorrow: st.netBorrow,
+        finalCount: sp.final_chip_count
+      });
+    });
+
+    const sorted = Object.values(map).sort((a,b)=>b.totalYen-a.totalYen);
+    setStats(sorted);
+    setSessCount(sessions.length);
+    setLoading(false);
+  };
+
+  useEffect(()=>{load();},[]);
+
+  const medal = (i) => i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}位`;
+
+  return (
+    <>
+      <div className="hdr"><Back onClick={onBack}/><span className="hdr-title">総合成績・ランキング</span></div>
+      <div className="page" style={{paddingTop:16}}>
+
+        {/* 期間フィルター */}
+        <div className="card mb">
+          <div style={{display:'flex',gap:8,alignItems:'center'}}>
+            <div style={{flex:1}}>
+              <label className="lbl">開始日</label>
+              <input className="inp" type="date" value={from} onChange={e=>setFrom(e.target.value)}/>
+            </div>
+            <div style={{color:'var(--muted)',paddingTop:18}}>〜</div>
+            <div style={{flex:1}}>
+              <label className="lbl">終了日</label>
+              <input className="inp" type="date" value={to} onChange={e=>setTo(e.target.value)}/>
+            </div>
+          </div>
+          <div style={{marginTop:10}}>
+            <Btn sm v="primary" full={false} onClick={load}>集計する</Btn>
+            {(from||to) && <Btn sm v="ghost" full={false} style={{marginLeft:8}} onClick={()=>{setFrom('');setTo('');setTimeout(load,0);}}>クリア</Btn>}
+          </div>
+        </div>
+
+        {loading ? <Loading/> : stats.length===0 ? (
+          <div style={{color:'var(--muted)',textAlign:'center',padding:'40px 0'}}>
+            終了済みセッションがありません
+          </div>
+        ) : (
+          <>
+            <div className="info" style={{marginBottom:12}}>
+              対象セッション数: <strong>{sessCount}回</strong>　参加プレイヤー数: <strong>{stats.length}名</strong>
+            </div>
+
+            {stats.map((p,i)=>{
+              const winRate = p.sessions.length>0 ? Math.round(p.wins/p.sessions.length*100) : 0;
+              const isOpen = expanded===i;
+              return (
+                <div key={i} className="card" style={{marginBottom:10,borderColor: i===0?'var(--amber)':i===1?'var(--muted)':i===2?'#cd7f32':'var(--border)'}}>
+                  {/* ヘッダー行 */}
+                  <div style={{display:'flex',alignItems:'center',gap:10,cursor:'pointer'}} onClick={()=>setExpanded(isOpen?null:i)}>
+                    <div style={{fontSize:22,width:32,textAlign:'center',flexShrink:0}}>{medal(i)}</div>
+                    <Av name={p.name}/>
+                    <div style={{flex:1}}>
+                      <div style={{fontWeight:700,fontSize:15}}>{p.name}</div>
+                      <div style={{fontSize:12,color:'var(--muted)',marginTop:1}}>
+                        {p.sessions.length}戦 {p.wins}勝 (勝率{winRate}%)
+                      </div>
+                    </div>
+                    <div style={{textAlign:'right'}}>
+                      <div style={{fontSize:22,fontWeight:700,fontFamily:'Outfit,sans-serif',color:p.totalYen>=0?'var(--green)':'var(--red)'}}>
+                        {fy(p.totalYen)}
+                      </div>
+                      <div style={{fontSize:11,color:'var(--muted)'}}>通算</div>
+                    </div>
+                    <div style={{color:'var(--muted)',fontSize:12,marginLeft:4}}>{isOpen?'▲':'▼'}</div>
+                  </div>
+
+                  {/* 展開：セッション別内訳 */}
+                  {isOpen && (
+                    <div style={{marginTop:12,borderTop:'1px solid var(--border)',paddingTop:12}}>
+                      <div style={{fontSize:11,color:'var(--muted)',fontWeight:700,letterSpacing:'.08em',marginBottom:8}}>セッション別内訳</div>
+                      {p.sessions.map((r,j)=>(
+                        <div key={j} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'6px 0',borderBottom:'1px solid var(--border)'}}>
+                          <div style={{flex:1}}>
+                            <div style={{fontSize:13}}>{r.sessionName}</div>
+                            <div style={{fontSize:11,color:'var(--muted)'}}>
+                              最終{r.finalCount}枚 / 使用{r.buyIn+r.netBorrow}枚
+                            </div>
+                          </div>
+                          <div style={{textAlign:'right'}}>
+                            <div style={{fontWeight:700,fontSize:14,color:r.profitYen>=0?'var(--green)':'var(--red)'}}>
+                              {fy(r.profitYen)}
+                            </div>
+                            <div style={{fontSize:11,color:'var(--muted)'}}>{fc(r.profitChips)}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </>
+        )}
+      </div>
+    </>
+  );
+};
 };
 
 // ─── SESSIONS LIST ────────────────────────────────────────────
@@ -1245,7 +1399,7 @@ const App = () => {
   const R = () => {
     switch(view) {
       case 'loading': return <div className="center"><Spin size={36}/></div>;
-      case 'home':    return <Home onCreate={()=>nav('create')} onJoin={handleJoinByCode} onUnsettled={()=>nav('unsettled')} onSessions={()=>nav('sessions')}/>;
+      case 'home':    return <Home onCreate={()=>nav('create')} onJoin={handleJoinByCode} onUnsettled={()=>nav('unsettled')} onSessions={()=>nav('sessions')} onStats={()=>nav('stats')}/>;
       case 'create':  return <CreateSession onBack={()=>nav('home')} onCreated={handleCreated}/>;
       case 'created': return created ? <Created session={created.session} adminToken={created.token} onAdmin={handleGoAdmin}/> : null;
       case 'join':    return session ? <JoinSession session={session} onBack={()=>nav('home')} onJoined={handleJoined}/> : null;
@@ -1255,6 +1409,7 @@ const App = () => {
       case 'settlement': return session ? <Settlement session={session} isAdmin={isAdmin}/> : null;
       case 'unsettled': return <Unsettled onBack={()=>nav('home')}/>;
       case 'sessions':  return <SessionsList onBack={()=>nav('home')} onSelect={handleJoinByCode} onViewResult={(s)=>{setSess(s);nav('settlement')}}/>;
+      case 'stats':     return <StatsPage onBack={()=>nav('home')}/>;
       default: return <Home onCreate={()=>nav('create')} onJoin={handleJoinByCode} onUnsettled={()=>nav('unsettled')}/>;
     }
   };
