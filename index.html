@@ -280,7 +280,7 @@ const CreateSession = ({onBack, onCreated}) => {
         {err && <div className="err">{err}</div>}
         <Inp lbl="テーブル名" value={f.name} onChange={set('name')} ph="例: 2024/01/20 自宅"/>
         <Inp lbl="バイイン枚数（固定）" type="number" value={f.buyIn} onChange={set('buyIn')} min="1"/>
-        <Inp lbl="チップレート（円/枚）" type="number" value={f.rate} onChange={set('rate')} min="1"/>
+        <Inp lbl="チップレート（円/枚）" type="number" value={f.rate} onChange={set('rate')} min="0.01" step="0.01"/>
         <Inp lbl="在庫チップ枚数" type="number" value={f.stock} onChange={set('stock')} min="1"/>
         {buyInYen>0 && (
           <div className="card" style={{background:'var(--indigo-dim)',border:'1px solid var(--indigo)',marginBottom:14}}>
